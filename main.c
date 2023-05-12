@@ -32,7 +32,7 @@ void *cherokee_core(void *arg)
 }
 
 // Main thread that select all client sockets in a select loop and three threads to handle them in parallel
-void *accept_thread(void *arg)
+void *multiplex_connection(void *arg)
 {
     int server_socket = *(int *)arg;
 
@@ -153,12 +153,7 @@ int main()
         exit(EXIT_FAILURE);
     }
 
-    // start accept thread
-    pthread_t accept_thread_id;
-    pthread_create(&accept_thread_id, NULL, accept_thread, &server_socket);
-
-    // wait for accept thread to finish
-    pthread_join(accept_thread_id, NULL);
+    multiplex_connection(&server_socket);
 
     return 0;
 }
