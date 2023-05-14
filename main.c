@@ -7,9 +7,11 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/select.h>
+#include <sys/epoll.h>
 
 #define PORT 8080
 #define MAX_CLIENTS 16
+#define MAX_EVENTS 10
 
 // thread that handles a client and return http response Hello World
 void *cherokee_core(void *arg)
@@ -21,14 +23,14 @@ void *cherokee_core(void *arg)
     read(client_socket, buffer, 1024);
     printf("%s\n", buffer);
 
+    // wait for 10 seconds
+    sleep(10);
+
     // send response
     char *response = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello World!";
     send(client_socket, response, strlen(response), 0);
 
-    // close client socket
-    close(client_socket);
-
-    return NULL;
+    return 0;
 }
 
 // Main thread that select all client sockets in a select loop and three threads to handle them in parallel
@@ -40,73 +42,77 @@ void *multiplex_connection(void *arg)
     int flags = fcntl(server_socket, F_GETFL, 0);
     fcntl(server_socket, F_SETFL, flags | O_NONBLOCK);
 
-    // initialize client sockets
-    int client_sockets[MAX_CLIENTS];
-    for (int i = 0; i < MAX_CLIENTS; i++)
+    // initialize epoll instance
+    int epfd = epoll_create1(0);
+    if (epfd == -1)
     {
-        client_sockets[i] = 0;
+        perror("epoll_create1");
+        exit(EXIT_FAILURE);
     }
 
-    // initialize fd_set
-    fd_set readfds;
-
-    // clear fd_set
-    FD_ZERO(&readfds);
+    // add server socket to epoll instance
+    struct epoll_event event;
+    event.data.fd = server_socket;
+    event.events = EPOLLIN | EPOLLET;
+    if (epoll_ctl(epfd, EPOLL_CTL_ADD, server_socket, &event) == -1)
+    {
+        perror("epoll_ctl: server_socket");
+        exit(EXIT_FAILURE);
+    }
 
     while (1)
     {
-        // add server socket to fd_set
-        FD_SET(server_socket, &readfds);
-
-        // add client sockets to fd_set
-        for (int i = 0; i < MAX_CLIENTS; i++)
+        // wait for events
+        struct epoll_event events[MAX_EVENTS];
+        int n = epoll_wait(epfd, events, MAX_EVENTS, -1);
+        if (n == -1)
         {
-            if (client_sockets[i] > 0)
-            {
-                FD_SET(client_sockets[i], &readfds);
-            }
-        }
-
-        // select sockets
-        int max_sd = server_socket;
-        for (int i = 0; i < MAX_CLIENTS; i++)
-        {
-            if (client_sockets[i] > max_sd)
-            {
-                max_sd = client_sockets[i];
-            }
-        }
-        int activity = select(max_sd + 1, &readfds, NULL, NULL, NULL);
-
-        // handle select error
-        if ((activity < 0))
-        {
-            perror("select error");
+            perror("epoll_wait");
             exit(EXIT_FAILURE);
         }
 
-        // handle server socket
-        if (FD_ISSET(server_socket, &readfds))
+        // loop through events
+        for (int i = 0; i < n; i++)
         {
-            // accept client socket
-            int client_socket;
-            if ((client_socket = accept(server_socket, NULL, NULL)) < 0)
+            printf("number of events: %d\n", n);
+            // if server socket is ready to read, accept new connection
+            if (events[i].data.fd == server_socket)
             {
-                perror("accept error");
-                exit(EXIT_FAILURE);
-            }
-
-            // set client socket to non-blocking
-            int flags = fcntl(client_socket, F_GETFL, 0);
-            fcntl(client_socket, F_SETFL, flags | O_NONBLOCK);
-
-            // add client socket to client sockets
-            for (int i = 0; i < MAX_CLIENTS; i++)
-            {
-                if (client_sockets[i] == 0)
+                // accept new connection
+                int client_socket = accept(server_socket, NULL, NULL);
+                if (client_socket == -1)
                 {
-                    client_sockets[i] = client_socket;
-                    break;
+                    perror("accept");
+                    exit(EXIT_FAILURE);
+                }
+
+                // set client socket to non-blocking
+                int flags = fcntl(client_socket, F_GETFL, 0);
+                fcntl(client_socket, F_SETFL, flags | O_NONBLOCK);
+
+                // add client socket to epoll instance
+                struct epoll_event event;
+                event.data.fd = client_socket;
+                event.events = EPOLLIN | EPOLLET;
+                if (epoll_ctl(epfd, EPOLL_CTL_ADD, client_socket, &event) == -1)
+                {
+                    perror("epoll_ctl: client_socket");
+                    exit(EXIT_FAILURE);
+                }
+            }
+            // if client socket is ready to read, handle request
+            else
+            {
+                // handle request in a new thread
+                pthread_t thread;
+                pthread_create(&thread, NULL, cherokee_core, &events[i].data.fd);
+                pthread_detach(thread);
+
+                // remove client socket from epoll instance when done
+                if (epoll_ctl(epfd, EPOLL_CTL_DEL, events[i].data.fd, NULL) == -1)
+                {
+                    perror("epoll_ctl: client_socket");
+                    exit(EXIT_FAILURE);
                 }
             }
         }
