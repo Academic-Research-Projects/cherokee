@@ -6,6 +6,9 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
+#include "http_response.h"
+#include "http_request.h"
+
 #define PORT 8080
 
 void *handle_connection(void *socket_desc)
@@ -83,6 +86,63 @@ int http_listen()
     }
 
     return 0;
+}
+
+void *main_loop(int *socket)
+{
+    // read connections from socket
+    while (1)
+    {
+        // read the header
+        char *request = read_request(socket);
+
+        // return bad request if the request is invalid
+        if (request == NULL)
+        {
+            createError400();
+            continue;
+        }
+
+        // checking the authorizations
+        int *is_authorized = check_authorization(request); // not implemented
+
+        // return unauthorized if the request is not authorized
+        if (request == -1)
+        {
+            createError401();
+            continue;
+        }
+
+        // parse the request
+        HttpRequest *http_request = parse_request(request); // not implemented
+
+        if (http_request == NULL)
+        {
+            createError404();
+            continue;
+        }
+
+        // create the response
+        HttpResponse *http_response = createResponse(http_request); // not implemented
+
+        if (http_response == NULL)
+        {
+            createError500();
+            continue;
+        }
+
+        int result = send_response(socket, http_response); // not implemented
+
+        if (result == -1)
+        {
+            createError500();
+            continue;
+        }
+
+        // free memory
+        free_request(http_request);
+        free_response(http_response);
+    }
 }
 
 int main(int argc, char *argv[])

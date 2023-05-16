@@ -1,8 +1,8 @@
 #ifndef ERROR_408_H
 #define ERROR_408_H
 
-#include "http_error.h"
+#include "http_response.h"
 
-HTTPError *createRequestTimeoutError(void);
+HttpResponse *createRequestTimeoutError(void);
 
 #endif

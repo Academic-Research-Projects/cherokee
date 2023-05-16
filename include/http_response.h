@@ -1,10 +1,10 @@
-#ifndef HTTP_ERROR_H
-#define HTTP_ERROR_H
+#ifndef HTTP_RESPONSE_H
+#define HTTP_RESPONSE_H
 
 typedef struct
 {
     int code;
     char *(*message)(void);
-} HTTPError;
+} HttpResponse;
 
 #endif

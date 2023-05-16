@@ -1,8 +1,8 @@
 #ifndef ERROR_504_H
 #define ERROR_504_H
 
-#include "http_error.h"
+#include "http_response.h"
 
-HTTPError *createGatewayTimeoutError(void);
+HttpResponse *createGatewayTimeoutError(void);
 
 #endif

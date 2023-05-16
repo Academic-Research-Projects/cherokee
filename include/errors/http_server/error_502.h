@@ -1,8 +1,8 @@
 #ifndef ERROR_502_H
 #define ERROR_502_H
 
-#include "http_error.h"
+#include "http_response.h"
 
-HTTPError *createBadGatewayError(void);
+HttpResponse *createBadGatewayError(void);
 
 #endif

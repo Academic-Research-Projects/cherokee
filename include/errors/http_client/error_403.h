@@ -1,8 +1,8 @@
 #ifndef ERROR_403_H
 #define ERROR_403_H
 
-#include "http_error.h"
+#include "http_response.h"
 
-HTTPError *createForbiddenError(void);
+HttpResponse *createForbiddenError(void);
 
 #endif

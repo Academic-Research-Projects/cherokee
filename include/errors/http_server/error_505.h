@@ -1,8 +1,8 @@
 #ifndef ERROR_505_H
 #define ERROR_505_H
 
-#include "http_error.h"
+#include "http_response.h"
 
-HTTPError *createHTTPVersionNotSupportedError(void);
+HttpResponse *createHTTPVersionNotSupportedError(void);
 
 #endif
