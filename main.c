@@ -88,7 +88,8 @@ int http_listen()
     return 0;
 }
 
-void *main_loop(int *socket)
+// TODO: implement stack/ queue for SPED behavior
+void main_loop(int socket)
 {
     // read connections from socket
     while (1)
@@ -107,7 +108,7 @@ void *main_loop(int *socket)
         int *is_authorized = check_authorization(request); // not implemented
 
         // return unauthorized if the request is not authorized
-        if (request == -1)
+        if (is_authorized == -1)
         {
             createError401();
             continue;
@@ -142,6 +143,7 @@ void *main_loop(int *socket)
         // free memory
         free_request(http_request);
         free_response(http_response);
+        free(request);
     }
 }
 
