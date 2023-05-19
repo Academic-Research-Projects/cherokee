@@ -11,155 +11,113 @@
 
 #define PORT 8080
 #define MAX_CLIENTS 16
-#define MAX_EVENTS 10
+#define MAX_EVENTS 32
 
-// thread that handles a client and return http response Hello World
-void *cherokee_core(void *arg)
+// Function to multiplex connections
+void multiplex_connections(int *arg)
 {
-    int client_socket = *(int *)arg;
+    int server_socket = *arg;
 
-    // read request
-    char buffer[1024] = {0};
-    read(client_socket, buffer, 1024);
-    printf("%s\n", buffer);
-
-    // wait for 10 seconds
-    sleep(10);
-
-    // send response
-    char *response = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello World!";
-    send(client_socket, response, strlen(response), 0);
-
-    return 0;
-}
-
-// Main thread that select all client sockets in a select loop and three threads to handle them in parallel
-void *multiplex_connection(void *arg)
-{
-    int server_socket = *(int *)arg;
-
-    // set server socket to non-blocking
-    int flags = fcntl(server_socket, F_GETFL, 0);
-    fcntl(server_socket, F_SETFL, flags | O_NONBLOCK);
-
-    // initialize epoll instance
-    int epfd = epoll_create1(0);
-    if (epfd == -1)
+    // Create epoll instance
+    int epoll_fd = epoll_create1(0);
+    if (epoll_fd == -1)
     {
         perror("epoll_create1");
         exit(EXIT_FAILURE);
     }
 
-    // add server socket to epoll instance
+    // Add server socket to epoll instance
     struct epoll_event event;
     event.data.fd = server_socket;
     event.events = EPOLLIN | EPOLLET;
-    if (epoll_ctl(epfd, EPOLL_CTL_ADD, server_socket, &event) == -1)
+    if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, server_socket, &event) == -1)
     {
         perror("epoll_ctl: server_socket");
         exit(EXIT_FAILURE);
     }
 
+    // Allocate memory for storing events
+    struct epoll_event *events = (struct epoll_event *)malloc(MAX_EVENTS * sizeof(struct epoll_event));
+    if (events == NULL)
+    {
+        perror("malloc");
+        exit(EXIT_FAILURE);
+    }
+
     while (1)
     {
-        // wait for events
-        struct epoll_event events[MAX_EVENTS];
-        int n = epoll_wait(epfd, events, MAX_EVENTS, -1);
-        if (n == -1)
+        int num_events = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
+        if (num_events == -1)
         {
             perror("epoll_wait");
             exit(EXIT_FAILURE);
         }
+        printf("Number of events: %d\n", num_events);
 
-        // loop through events
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < num_events; i++)
         {
-            printf("number of events: %d\n", n);
-            // if server socket is ready to read, accept new connection
-            if (events[i].data.fd == server_socket)
-            {
-                // accept new connection
-                int client_socket = accept(server_socket, NULL, NULL);
-                if (client_socket == -1)
-                {
-                    perror("accept");
-                    exit(EXIT_FAILURE);
-                }
-
-                // set client socket to non-blocking
-                int flags = fcntl(client_socket, F_GETFL, 0);
-                fcntl(client_socket, F_SETFL, flags | O_NONBLOCK);
-
-                // add client socket to epoll instance
-                struct epoll_event event;
-                event.data.fd = client_socket;
-                event.events = EPOLLIN | EPOLLET;
-                if (epoll_ctl(epfd, EPOLL_CTL_ADD, client_socket, &event) == -1)
-                {
-                    perror("epoll_ctl: client_socket");
-                    exit(EXIT_FAILURE);
-                }
-            }
-            // if client socket is ready to read, handle request
-            else
-            {
-                // handle request in a new thread
-                pthread_t thread;
-                pthread_create(&thread, NULL, cherokee_core, &events[i].data.fd);
-                pthread_detach(thread);
-
-                // remove client socket from epoll instance when done
-                if (epoll_ctl(epfd, EPOLL_CTL_DEL, events[i].data.fd, NULL) == -1)
-                {
-                    perror("epoll_ctl: client_socket");
-                    exit(EXIT_FAILURE);
-                }
-            }
+            int fd = events[i].data.fd;
+            printf("Event on descriptor: %d\n", fd);
         }
     }
+
+    free(events);
+    close(epoll_fd);
 }
 
-// main() function that starts the server
-int main()
+// Function to create a socket
+int create_server_socket(int port)
 {
     int server_socket;
-    struct sockaddr_in address;
-    int opt = 1;
-    // int addrlen = sizeof(address);
+    struct sockaddr_in server_address;
 
-    // create server socket
+    // Creating socket file descriptor
     if ((server_socket = socket(AF_INET, SOCK_STREAM, 0)) == 0)
     {
         perror("socket failed");
         exit(EXIT_FAILURE);
     }
 
-    // set server socket options
+    // Set socket to non-blocking
+    int flags = fcntl(server_socket, F_GETFL, 0);
+    fcntl(server_socket, F_SETFL, flags | O_NONBLOCK);
+
+    // Forcefully attaching socket to the port 8080
+    int opt = 1;
     if (setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)))
     {
         perror("setsockopt failed");
         exit(EXIT_FAILURE);
     }
 
-    address.sin_family = AF_INET;
-    address.sin_addr.s_addr = INADDR_ANY;
-    address.sin_port = htons(PORT);
+    server_address.sin_family = AF_INET;
+    server_address.sin_addr.s_addr = INADDR_ANY;
+    server_address.sin_port = htons(port);
 
-    // bind server socket to address
-    if (bind(server_socket, (struct sockaddr *)&address, sizeof(address)) < 0)
+    // Forcefully attaching socket to the port 8080
+    if (bind(server_socket, (struct sockaddr *)&server_address, sizeof(server_address)) < 0)
     {
         perror("bind failed");
         exit(EXIT_FAILURE);
     }
 
-    // listen for incoming connections
-    if (listen(server_socket, MAX_CLIENTS) < 0)
+    if (listen(server_socket, 3) < 0)
     {
         perror("listen failed");
         exit(EXIT_FAILURE);
     }
 
-    multiplex_connection(&server_socket);
+    printf("Server listening on port %d\n", port);
+
+    return server_socket;
+}
+
+// main() function that starts the server
+int main()
+{
+    int server_socket = create_server_socket(PORT);
+
+    multiplex_connections(&server_socket);
 
     return 0;
 }
