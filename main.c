@@ -10,12 +10,14 @@
 #include <sys/epoll.h>
 
 #define PORT 8080
-#define MAX_CLIENTS 16
-#define MAX_EVENTS 32
+#define MAX_EVENTS 1000
+#define LISTEN_LIMIT 200
 
 // Function to multiplex connections
 void multiplex_connections(int *arg)
 {
+    struct sockaddr_in client_addr;
+    char buffer[1024] = {0};
     int server_socket = *arg;
 
     // Create epoll instance
@@ -29,7 +31,7 @@ void multiplex_connections(int *arg)
     // Add server socket to epoll instance
     struct epoll_event event;
     event.data.fd = server_socket;
-    event.events = EPOLLIN | EPOLLET;
+    event.events = EPOLLIN;
     if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, server_socket, &event) == -1)
     {
         perror("epoll_ctl: server_socket");
@@ -47,17 +49,65 @@ void multiplex_connections(int *arg)
     while (1)
     {
         int num_events = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
-        if (num_events == -1)
-        {
-            perror("epoll_wait");
-            exit(EXIT_FAILURE);
-        }
         printf("Number of events: %d\n", num_events);
 
         for (int i = 0; i < num_events; i++)
         {
-            int fd = events[i].data.fd;
-            printf("Event on descriptor: %d\n", fd);
+            if (events[i].data.fd == server_socket)
+            {
+                // new client connection
+                int new_socket, addrlen = sizeof(client_addr);
+                if ((new_socket = accept(server_socket, (struct sockaddr *)&client_addr, (socklen_t *)&addrlen)) < 0)
+                {
+                    perror("accept");
+                    exit(EXIT_FAILURE);
+                };
+
+                printf("New client connection, socket fd is %d, IP is %s, port is %d\n",
+                       new_socket, inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
+
+                event.events = EPOLLIN | EPOLLET;
+                event.data.fd = new_socket;
+
+                // Add new client socket to epoll instance
+                if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, new_socket, &event) == -1)
+                {
+                    perror("epoll_ctl: new_socket");
+                    exit(EXIT_FAILURE);
+                }
+                printf("Added new client socket to epoll instance\n");
+            }
+            else
+            {
+                // existing client connection
+                int client_socket = events[i].data.fd;
+                int valread = read(client_socket, buffer, 1024);
+                if (valread == 0)
+                {
+                    // client disconnected
+                    printf("Client disconnected, socket fd is %d\n", client_socket);
+                    close(client_socket);
+                }
+                else
+                {
+                    // client sent a message
+                    printf("Client sent a message, socket fd is %d\n", client_socket);
+                    // send message back to client in HTTP format
+                    char *message = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
+                    send(client_socket, message, strlen(message), 0);
+
+                    // Remove client socket from epoll instance
+                    if (epoll_ctl(epoll_fd, EPOLL_CTL_DEL, client_socket, NULL) == -1)
+                    {
+                        perror("epoll_ctl: client_socket");
+                        exit(EXIT_FAILURE);
+                    }
+
+                    // close client connection
+                    close(client_socket);
+                    printf("Closed client socket\n-----------------\n");
+                }
+            }
         }
     }
 
@@ -101,7 +151,7 @@ int create_server_socket(int port)
         exit(EXIT_FAILURE);
     }
 
-    if (listen(server_socket, 3) < 0)
+    if (listen(server_socket, LISTEN_LIMIT) < 0)
     {
         perror("listen failed");
         exit(EXIT_FAILURE);
