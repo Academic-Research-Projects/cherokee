@@ -39,7 +39,7 @@ void multiplex_connections(int *arg)
     }
 
     // Allocate memory for storing events
-    struct epoll_event *events = (struct epoll_event *)malloc(MAX_EVENTS * sizeof(struct epoll_event));
+    struct epoll_event *events = malloc(MAX_EVENTS * sizeof(struct epoll_event));
     if (events == NULL)
     {
         perror("malloc");
@@ -106,6 +106,10 @@ void multiplex_connections(int *arg)
                     // close client connection
                     close(client_socket);
                     printf("Closed client socket\n-----------------\n");
+
+                    // Reinitialize event structure
+                    event.data.fd = -1;
+                    event.events = 0;
                 }
             }
         }

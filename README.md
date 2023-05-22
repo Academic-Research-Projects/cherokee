@@ -4,6 +4,8 @@ login: blanch_b loizag_g utzman_f baudet_c
 ## Requirements
 - Linux (Tested on Debian 11)
 - GCC compiler : `sudo apt-get install build-essential`
+- Apache Bench : `sudo apt install apache2-utils`
+    - Usage : `ab -n 1000 -c 100 http://localhost:8080/`
 - Valgrind : `sudo apt-get install valgrind`
 - GDB : `sudo apt-get install gdb`
 - Criterion : https://github.com/Snaipe/Criterion#downloads 
