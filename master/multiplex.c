@@ -8,6 +8,7 @@
 #include <fcntl.h>
 #include <sys/select.h>
 #include <sys/epoll.h>
+#include "../crud_operations/http_get.h"
 
 #define MAX_EVENTS 1000
 
@@ -15,7 +16,6 @@
 void multiplex_connections(int *arg)
 {
     struct sockaddr_in client_addr;
-    char buffer[1024] = {0};
     int server_socket = *arg;
 
     // Create epoll instance
@@ -79,36 +79,12 @@ void multiplex_connections(int *arg)
             {
                 // existing client connection
                 int client_socket = events[i].data.fd;
-                int valread = read(client_socket, buffer, 1024);
-                if (valread == 0)
-                {
-                    // client disconnected
-                    printf("Client disconnected, socket fd is %d\n", client_socket);
-                    close(client_socket);
-                }
-                else
-                {
-                    // client sent a message
-                    printf("Client sent a message, socket fd is %d\n", client_socket);
-                    // send message back to client in HTTP format
-                    char *message = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
-                    send(client_socket, message, strlen(message), 0);
+                http_get(&client_socket);
 
-                    // Remove client socket from epoll instance
-                    if (epoll_ctl(epoll_fd, EPOLL_CTL_DEL, client_socket, NULL) == -1)
-                    {
-                        perror("epoll_ctl: client_socket");
-                        exit(EXIT_FAILURE);
-                    }
-
-                    // close client connection
-                    close(client_socket);
-                    printf("Closed client socket\n-----------------\n");
-
-                    // Reinitialize event structure
-                    event.data.fd = -1;
-                    event.events = 0;
-                }
+                // Reinitialize event structure
+                event.data.fd = -1;
+                event.events = 0;
+                // }
             }
         }
     }

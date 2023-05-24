@@ -1,0 +1,22 @@
+{
+    "zou": {
+        "bisou": "bisou",
+        "mais": "dites",
+        "moi": {
+            "savez": [
+                {
+                    "vous": "ce",
+                    "que": "veutDireEntreNous()"
+                },
+                {
+                    "zou": "bisous",
+                    "bisous": "ZouBisous()"
+                },
+                {
+                    "mon": "Dieu",
+                    "desBisous": "Soupire()"
+                }
+            ]
+        }
+    }
+}
