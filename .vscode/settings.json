@@ -1,0 +1,9 @@
+{
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "/home/brice/AQL5-Cherokee",
+            "binaryPath": "/home/brice/AQL5-Cherokee/cherokee",
+            "binaryArgs": []
+        }
+    ]
+}
