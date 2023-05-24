@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-Wall -Wextra -pthread -g
 TARGET=cherokee
-SRCS=main.c # liste des fichiers sources
+SRCS=main.c master/multiplex.c master/server_socket.c # liste des fichiers sources
 OBJS=$(SRCS:.c=.o)
 
 all:$(TARGET)
