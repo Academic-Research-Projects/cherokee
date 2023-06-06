@@ -5,9 +5,9 @@ char *forbiddenMessage(void)
     return "Forbidden";
 }
 
-HTTPError *createError403(void)
+HttpResponse *createError403(void)
 {
-    HTTPError *error = malloc(sizeof(HTTPError));
+    HttpResponse *error = malloc(sizeof(HttpResponse));
     error->code = 403;
     error->message = forbiddenMessage;
     return error;

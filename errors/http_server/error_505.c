@@ -5,9 +5,9 @@ char *httpVersionNotSupportedMessage(void)
     return "HTTP Version Not Supported";
 }
 
-HTTPError *createError505(void)
+HttpResponse *createError505(void)
 {
-    HTTPError *error = malloc(sizeof(HTTPError));
+    HttpResponse *error = malloc(sizeof(HttpResponse));
     error->code = 505;
     error->message = httpVersionNotSupportedMessage;
     return error;

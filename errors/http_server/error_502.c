@@ -5,9 +5,9 @@ char *badGatewayMessage(void)
     return "Bad Gateway";
 }
 
-HTTPError *createError502(void)
+HttpResponse *createError502(void)
 {
-    HTTPError *error = malloc(sizeof(HTTPError));
+    HttpResponse *error = malloc(sizeof(HttpResponse));
     error->code = 502;
     error->message = badGatewayMessage;
     return error;

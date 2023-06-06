@@ -13,7 +13,7 @@
 #define MAX_EVENTS 1000
 
 // Function to multiplex connections
-void multiplex_connections(int *arg)
+void smultiplex_connections(int *arg)
 {
     struct sockaddr_in client_addr;
     int server_socket = *arg;

@@ -5,9 +5,9 @@ char *requestTimeoutMessage(void)
     return "Request Timeout";
 }
 
-HTTPError *createError408(void)
+HttpResponse *createError408(void)
 {
-    HTTPError *error = malloc(sizeof(HTTPError));
+    HttpResponse *error = malloc(sizeof(HttpResponse));
     error->code = 408;
     error->message = requestTimeoutMessage;
     return error;

@@ -5,9 +5,9 @@ char *notImplementedMessage(void)
     return "Not Implemented";
 }
 
-HTTPError *createError501(void)
+HttpResponse *createError501(void)
 {
-    HTTPError *error = malloc(sizeof(HTTPError));
+    HttpResponse *error = malloc(sizeof(HttpResponse));
     error->code = 501;
     error->message = notImplementedMessage;
     return error;

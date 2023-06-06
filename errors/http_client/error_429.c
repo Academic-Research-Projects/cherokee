@@ -5,9 +5,9 @@ char *tooManyRequestsMessage(void)
     return "Too Many Requests";
 }
 
-HTTPError *createError429(void)
+HttpResponse *createError429(void)
 {
-    HTTPError *error = malloc(sizeof(HTTPError));
+    HttpResponse *error = malloc(sizeof(HttpResponse));
     error->code = 429;
     error->message = tooManyRequestsMessage;
     return error;

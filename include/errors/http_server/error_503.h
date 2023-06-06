@@ -1,8 +1,8 @@
 #ifndef ERROR_503_H
 #define ERROR_503_H
 
-#include "http_error.h"
+#include "http_response.h"
 
-HTTPError *createServiceUnavailableError(void);
+HttpResponse *createServiceUnavailableError(void);
 
 #endif

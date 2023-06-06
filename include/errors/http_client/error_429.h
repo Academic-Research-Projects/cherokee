@@ -1,8 +1,8 @@
 #ifndef ERROR_429_H
 #define ERROR_429_H
 
-#include "http_error.h"
+#include "http_response.h"
 
-HTTPError *createTooManyRequestsError(void);
+HttpResponse *createTooManyRequestsError(void);
 
 #endif

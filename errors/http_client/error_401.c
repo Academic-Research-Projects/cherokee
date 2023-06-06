@@ -5,9 +5,9 @@ char *unauthorizedMessage(void)
     return "Unauthorized";
 }
 
-HTTPError *createError401(void)
+HttpResponse *createError401(void)
 {
-    HTTPError *error = malloc(sizeof(HTTPError));
+    HttpResponse *error = malloc(sizeof(HttpResponse));
     error->code = 401;
     error->message = unauthorizedMessage;
     return error;

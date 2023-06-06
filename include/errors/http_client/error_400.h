@@ -3,6 +3,6 @@
 
 #include "http_response.h"
 
-HTTPError *createBadRequestError(void);
+HttpResponse *createBadRequestError(void);
 
 #endif

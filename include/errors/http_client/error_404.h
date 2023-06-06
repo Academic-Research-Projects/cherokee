@@ -1,8 +1,8 @@
 #ifndef ERROR_404_H
 #define ERROR_404_H
 
-#include "http_error.h"
+#include "http_response.h"
 
-HTTPError *createNotFoundError(void);
+HttpResponse *createNotFoundError(void);
 
 #endif

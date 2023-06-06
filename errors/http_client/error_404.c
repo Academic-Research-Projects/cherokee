@@ -5,9 +5,9 @@ char *notFoundMessage(void)
     return "Not Found";
 }
 
-HTTPError *createError404(void)
+HttpResponse *createError404(void)
 {
-    HTTPError *error = malloc(sizeof(HTTPError));
+    HttpResponse *error = malloc(sizeof(HttpResponse));
     error->code = 404;
     error->message = notFoundMessage;
     return error;

@@ -5,9 +5,9 @@ char *gatewayTimeoutMessage(void)
     return "Gateway Timeout";
 }
 
-HTTPError *createError504(void)
+HttpResponse *createError504(void)
 {
-    HTTPError *error = malloc(sizeof(HTTPError));
+    HttpResponse *error = malloc(sizeof(HttpResponse));
     error->code = 504;
     error->message = gatewayTimeoutMessage;
     return error;

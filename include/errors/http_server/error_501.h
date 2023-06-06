@@ -1,8 +1,8 @@
 #ifndef ERROR_501_H
 #define ERROR_501_H
 
-#include "http_error.h"
+#include "http_response.h"
 
-HTTPError *createNotImplementedError(void);
+HttpResponse *createNotImplementedError(void);
 
 #endif

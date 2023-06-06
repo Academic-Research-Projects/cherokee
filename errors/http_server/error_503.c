@@ -5,9 +5,9 @@ char *serviceUnavailableMessage(void)
     return "Service Unavailable";
 }
 
-HTTPError *createError503(void)
+HttpResponse *createError503(void)
 {
-    HTTPError *error = malloc(sizeof(HTTPError));
+    HttpResponse *error = malloc(sizeof(HttpResponse));
     error->code = 503;
     error->message = serviceUnavailableMessage;
     return error;

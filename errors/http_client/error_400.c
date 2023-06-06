@@ -5,9 +5,9 @@ char *badRequestMessage(void)
     return "Bad Request";
 }
 
-HTTPError *createError400(void)
+HttpResponse *createError400(void)
 {
-    HTTPError *error = malloc(sizeof(HTTPError));
+    HttpResponse *error = malloc(sizeof(HttpResponse));
     error->code = 400;
     error->message = badRequestMessage;
     return error;

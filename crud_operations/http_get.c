@@ -1,3 +1,4 @@
+#include "http_response.h"
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,6 +37,7 @@ void *http_get(void *socket_desc)
     if (file_fd == -1)
     {
         // file not found, send 404 response
+        // HttpReponse error = createError404();
         char *response = "HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\n\r\nFile not found\r\n";
         write(client_socket, response, strlen(response));
     }

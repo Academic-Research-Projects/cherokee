@@ -5,9 +5,9 @@ char *internalServerErrorMessage(void)
     return "Internal Server Error";
 }
 
-HTTPError *createError500(void)
+HttpResponse *createError500(void)
 {
-    HTTPError *error = malloc(sizeof(HTTPError));
+    HttpResponse *error = malloc(sizeof(HttpResponse));
     error->code = 500;
     error->message = internalServerErrorMessage;
     return error;
