@@ -33,14 +33,18 @@ void *http_get(void *socket_desc)
 
     // open the requested file
     int file_fd = open(file_path, O_RDONLY);
-    if (file_fd == -1) {
+    if (file_fd == -1)
+    {
         // file not found, send 404 response
         char *response = "HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\n\r\nFile not found\r\n";
         write(client_socket, response, strlen(response));
-    } else {
+    }
+    else
+    {
         // determine the content type based on the file extension
         char *file_extension = strrchr(filename, '.');
-        if (file_extension) {
+        if (file_extension)
+        {
             if (strcmp(file_extension, ".html") == 0)
                 content_type = "text/html";
             else if (strcmp(file_extension, ".json") == 0)
@@ -57,7 +61,8 @@ void *http_get(void *socket_desc)
         // read and send the file contents
         char file_buffer[1024];
         ssize_t bytes_read;
-        while ((bytes_read = read(file_fd, file_buffer, sizeof(file_buffer))) > 0) {
+        while ((bytes_read = read(file_fd, file_buffer, sizeof(file_buffer))) > 0)
+        {
             write(client_socket, file_buffer, bytes_read);
         }
 
@@ -66,7 +71,7 @@ void *http_get(void *socket_desc)
 
     // close socket and free memory
     close(client_socket);
-    free(socket_desc);
+    // free(socket_desc);
 
     return NULL;
 }
