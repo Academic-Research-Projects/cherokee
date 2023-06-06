@@ -20,3 +20,14 @@ login: blanch_b loizag_g utzman_f baudet_c
 - Run the program with gdb : `gdb ./cherokee` => Debug mode
 <!-- - Run criterion tests : `make tests_run` -->
 <!-- - Run functional tests : ... -->
+
+## How to test
+- Open another terminal
+- Execute `curl http://localhost:8080`
+- You should see a "Hello, World" in the client terminal
+- This is the output expected from the server, in your server terminal :
+
+`GET / HTTP/1.1
+Host: localhost:8080
+User-Agent: curl/7.74.0
+Accept: */*`

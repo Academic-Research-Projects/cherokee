@@ -5,31 +5,12 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include "crud_operations/http_get.h"
 
 #include "http_response.h"
 #include "http_request.h"
 
 #define PORT 8080
-
-void *handle_connection(void *socket_desc)
-{
-    int client_socket = *(int *)socket_desc;
-
-    // read client request
-    char buffer[1024] = {0};
-    read(client_socket, buffer, 1024);
-    printf("%s\n", buffer);
-
-    // send response
-    char *response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nHello, World!\r\n";
-    write(client_socket, response, strlen(response));
-
-    // close socket and free memory
-    close(client_socket);
-    free(socket_desc);
-
-    return NULL;
-}
 
 int http_listen()
 {
@@ -78,7 +59,7 @@ int http_listen()
         int *socket_desc = malloc(sizeof(*socket_desc));
         *socket_desc = new_socket;
 
-        if (pthread_create(&thread_id, NULL, handle_connection, (void *)socket_desc) < 0)
+        if (pthread_create(&thread_id, NULL, http_get, (void *)socket_desc) < 0)
         {
             perror("could not create thread");
             exit(EXIT_FAILURE);
