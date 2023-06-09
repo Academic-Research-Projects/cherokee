@@ -1,0 +1,37 @@
+{
+    "name": "aql5-dev",
+    "build": {
+        "dockerfile": "./Dockerfile"
+    },
+    "shutdownAction": "stopContainer",
+    "appPort": [8080],
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "GitHub.copilot-chat",
+                "GitHub.copilot-nightly",
+                "esbenp.prettier-vscode",
+                "ms-vscode.cpptools-extension-pack",
+                "mhutchie.git-graph"
+            ],
+            "settings": {
+                "terminal.integrated.profiles.linux": {
+                    "bash": {
+                        "path": "bash"
+                    }
+                },
+                "terminal.integrated.defaultProfile.linux": "bash"
+            }
+        }
+    },
+    "mounts": [
+        "source=${localWorkspaceFolder}/AQL5-git,target=/workspace,type=bind,consistency=cached",
+        "source=c/Users/brice/.ssh,target=/brice/.ssh,type=bind,consistency=cached,readonly"
+    ],
+    "remoteUser": "brice",
+    "remoteEnv": {
+        "GIT_SSH_COMMAND": "ssh -i /brice/.ssh/id_rsa -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
+    },
+    "postStartCommand": "sudo chown -R brice:brice /workspaces",
+    "runArgs": ["--name", "aql5-dev"]
+}
