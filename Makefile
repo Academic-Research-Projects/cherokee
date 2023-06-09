@@ -7,7 +7,7 @@ TEST_TARGET = test_cherokee
 
 SRCS=main.c crud_operations/http_get.c master/multiplex.c master/server_socket.c # liste des fichiers sources
 OBJS=$(SRCS:.c=.o)
-TEST_SRCS = $(wildcard test/*.c)
+TEST_SRCS = $(wildcard test/*.c) master/server_socket.c
 TEST_OBJS = $(TEST_SRCS:.c=.o)
 
 .PHONY: all clean test

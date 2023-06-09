@@ -22,8 +22,7 @@ login: blanch_b loizag_g utzman_f baudet_c
 - Run the program with valgrind : `valgrind ./cherokee` => Debug mode (memory leaks)
 - Run the program with gdb : `gdb ./cherokee` => Debug mode
 - Run apache bench : `ab -n 1000 -c 100 http://localhost:8080/`
-<!-- - Run criterion tests : `make tests_run` -->
-<!-- - Run functional tests : ... -->
+- Run criterion tests : `make ftest`
 
 ## How to test
 - Open another terminal
