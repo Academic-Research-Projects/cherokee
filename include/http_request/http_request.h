@@ -8,6 +8,7 @@ typedef struct
 {
     RequestLine request_line;
     Headers headers;
+    char *body; // For methods like POST, PUT etc...
 } HttpRequest;
 
 #endif

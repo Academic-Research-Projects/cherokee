@@ -3,9 +3,9 @@
 
 typedef struct
 {
-    char *host;
-    char *accept;
-    char *content_type;
+    char *name;
+    char *value;
+    // struct Headers *next;
 } Headers;
 
 #endif

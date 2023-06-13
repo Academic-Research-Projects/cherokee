@@ -4,7 +4,8 @@
 typedef struct
 {
     char *method;
-    char *uri;
+    char *requestTarget;
+    char *httpVersion; // 1.1
 } RequestLine;
 
 #endif
