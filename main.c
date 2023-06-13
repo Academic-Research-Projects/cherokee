@@ -8,6 +8,7 @@
 #include <fcntl.h>
 #include "master/multiplex.h"
 #include "master/server_socket.h"
+#include "crud_operations/http_get.h"
 
 #define PORT 8080
 
