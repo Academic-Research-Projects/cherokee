@@ -9,6 +9,8 @@
 #include <sys/select.h>
 #include <sys/epoll.h>
 #include "../crud_operations/http_get.h"
+#include "http_request.h"
+#include "http_response.h"
 
 #define MAX_EVENTS 1000
 
@@ -79,6 +81,15 @@ void smultiplex_connections(int *arg)
             {
                 // existing client connection
                 int client_socket = events[i].data.fd;
+
+                struct HttpRequest http_request;
+                if (!parse_http_request(client_socket, &http_request))
+                {
+                    printf("Error parsing header request\n");
+                    continue;
+                }
+
+                handle_request(&http_request, client_socket);
                 http_get(&client_socket);
 
                 // Reinitialize event structure

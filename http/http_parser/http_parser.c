@@ -13,5 +13,34 @@ bool parse_http_request(int client_socket, struct HttpRequest *httpRequest)
 
     buffer[bytes_received] = '\0';
 
-    httpRequest->request_line.method = strtok(buffer, " ");
+    char *token;
+
+    token = strtok(buffer, " ");
+    if (token == NULL)
+    {
+        perror("strtok");
+        return false;
+    }
+
+    httpRequest->request_line.method = strdup(token);
+
+    token = strtok(NULL, " ");
+    if (token == NULL)
+    {
+        perror("strtok");
+        return false;
+    }
+
+    httpRequest->request_line.requestTarget = strdup(token);
+
+    token = strtok(NULL, "\r\n");
+    if (token == NULL)
+    {
+        perror("strtok");
+        return false;
+    }
+
+    httpRequest = > request_line.httpVersion = strdup(token);
+
+    return true;
 }

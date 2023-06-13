@@ -7,7 +7,8 @@
         }
     ],
     "files.associations": {
-        "inet.h": "c"
+        "inet.h": "c",
+        "http_response.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
