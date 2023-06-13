@@ -1,8 +1,10 @@
 #include "http_response.h"
 #include "http_request.h"
 
-HttpResponse handle_request(HttpRequest *request)
+void handle_request(HttpRequest *request, int clientSocket)
 {
+
+    char *responseLine = "HTTP/1.1 200 OK\r\n";
     HttpResponse response;
     response.status_code = 200;
     response.content_type = "text/plain";
@@ -50,5 +52,5 @@ HttpResponse handle_request(HttpRequest *request)
         close(file_fd);
     }
 
-    return response;
+    return httpResponse;
 }
