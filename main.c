@@ -9,6 +9,7 @@
 #include "master/multiplex.h"
 #include "master/server_socket.h"
 #include "crud_operations/http_get.h"
+#include "crud_operations/http_post.h"
 
 #define PORT 8080
 

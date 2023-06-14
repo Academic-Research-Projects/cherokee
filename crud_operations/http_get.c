@@ -70,7 +70,7 @@ void *http_get(void *socket_desc)
     }
 
     // close socket and free memory
-    close(client_socket);
+    // close(client_socket);
     // free(socket_desc);
 
     return NULL;
