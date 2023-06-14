@@ -34,3 +34,17 @@ login: blanch_b loizag_g utzman_f baudet_c
 Host: localhost:8080
 User-Agent: curl/7.74.0
 Accept: */*`
+
+
+## How to make Criterion unit tests
+- Create a file named `test_*.c` in the `test` folder or use an existing one for the same purpose
+- Write your tests in this file
+    - Include the criterion header : `#include <criterion/criterion.h>`
+    - Include the header of the file you want to test : `#include "../src/*.h"`
+    - Write a function named : `Test(TestName, TestDescription)`
+    - Write your tests in this function
+    - Use the criterion macros to test your functions :
+        - `cr_assert(condition)` : Assert that the condition is true
+        - documentation : https://criterion.readthedocs.io/en/latest/assert.html
+- Group tests by purpose/features in different files
+- You can use the template as an example : `test/test_template.c` or `test/test_server_socket.c`
