@@ -11,7 +11,8 @@ HttpResponse *createError404(HttpResponse *response)
     response->httpVersion = strdup("HTTP/1.1");
     response->statusCode = 404;
     response->statusText = notFoundMessage();
-    response->headers = NULL;
+    response->headers->name = NULL;
+    response->headers->value = NULL;
     response->body = NULL;
     return response;
 }

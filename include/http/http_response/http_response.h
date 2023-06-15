@@ -5,7 +5,7 @@ struct ResponseHeaders
 {
     char *name;
     char *value;
-    struct ResponseHeaders *next;
+    // struct ResponseHeaders *next; //For multiple header scenario.
 };
 
 struct HttpResponse

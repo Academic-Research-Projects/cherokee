@@ -5,12 +5,13 @@ char *successMessage(void)
     return "OK";
 }
 
-HttpResponse *createSuccess200(HttpResponse *response)
+HttpResponse *createSuccess200(HttpResponse *response, char *content_type)
 {
     response->httpVersion = strdup("HTTP/1.1");
     response->statusCode = 200;
     response->statusText = successMessage();
-    response->headers = NULL;
+    response->headers->name = "Content-Type";
+    response->headers->value = content_type;
     response->body = NULL;
     return response;
 }

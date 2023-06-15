@@ -38,11 +38,12 @@ void *http_get(int client_socket)
     int file_fd = open(file_path, O_RDONLY);
     if (file_fd == -1)
     {
+
         // file not found, send 404 response
         createError404(&response);
-        response_str = format_http_response(respsonse);
-        write(client_socket, response_str, strlen(response_str));
-        free(response_str);
+        response_str = format_http_response(&respsonse);
+        // write(client_socket, response_str, strlen(response_str));
+        // free(response_str);
     }
     else
     {
@@ -60,8 +61,11 @@ void *http_get(int client_socket)
                 content_type = "image/png";
         }
 
-        // send response headers
-        dprintf(client_socket, "HTTP/1.1 200 OK\r\nContent-Type: %s\r\n\r\n", content_type);
+        createSuccess200(&response);
+        response_str = format_http_response(&response);
+
+        write(client_socket, response_str, strlen(response_str));
+        free(response_str);
 
         // read and send the file contents
         char file_buffer[1024];
