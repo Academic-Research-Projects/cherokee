@@ -12,9 +12,8 @@
 #define PORT 8080
 #define BASE_DIRECTORY "test_files"
 
-void *http_get(void *socket_desc)
+void *http_get(int client_socket)
 {
-    int client_socket = *(int *)socket_desc;
 
     // read client request
     char buffer[1024] = {0};
@@ -32,14 +31,18 @@ void *http_get(void *socket_desc)
     // default content type
     char *content_type = "text/plain";
 
+    HttpResponse *response;
+    char *response_str;
+
     // open the requested file
     int file_fd = open(file_path, O_RDONLY);
     if (file_fd == -1)
     {
         // file not found, send 404 response
-        // HttpReponse error = createError404();
-        char *response = "HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\n\r\nFile not found\r\n";
-        write(client_socket, response, strlen(response));
+        createError404(&response);
+        response_str = format_http_response(respsonse);
+        write(client_socket, response_str, strlen(response_str));
+        free(response_str);
     }
     else
     {

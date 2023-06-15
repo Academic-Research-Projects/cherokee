@@ -8,7 +8,8 @@
     ],
     "files.associations": {
         "inet.h": "c",
-        "http_response.h": "c"
+        "http_response.h": "c",
+        "success_201.C": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

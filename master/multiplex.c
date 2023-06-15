@@ -90,7 +90,7 @@ void smultiplex_connections(int *arg)
                 }
 
                 handle_request(&http_request, client_socket);
-                http_get(&client_socket);
+                // http_get(&client_socket);
 
                 // Reinitialize event structure
                 event.data.fd = -1;
