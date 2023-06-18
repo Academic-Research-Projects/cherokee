@@ -3,4 +3,6 @@
 
 int create_server_socket(int port);
 
+void fork_server(int *server_socket);
+
 #endif

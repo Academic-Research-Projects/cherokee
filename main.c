@@ -17,7 +17,9 @@ int main()
 {
     int server_socket = create_server_socket(PORT);
 
-    multiplex_connections(&server_socket);
+    fork_server(server_socket);
+
+    // multiplex_connections(&server_socket);
 
     return 0;
 }

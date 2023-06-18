@@ -7,6 +7,8 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#include "master/worker.h"
+
 #define LISTEN_LIMIT 200
 
 // Function to create a socket
@@ -38,20 +40,60 @@ int create_server_socket(int port)
     server_address.sin_addr.s_addr = INADDR_ANY;
     server_address.sin_port = htons(port);
 
-    // Forcefully attaching socket to the port 8080
+    // Bind the socket to the server address
     if (bind(server_socket, (struct sockaddr *)&server_address, sizeof(server_address)) < 0)
     {
         perror("bind failed");
         exit(EXIT_FAILURE);
     }
 
+    // Start listening for client connections
     if (listen(server_socket, LISTEN_LIMIT) < 0)
     {
         perror("listen failed");
         exit(EXIT_FAILURE);
     }
 
-    printf("Server listening on port %d\n", port);
+    // printf("Server listening on port %d\n", port);
 
     return server_socket;
+}
+
+void fork_server(int *server_socket)
+{
+    int clientSocket;
+    struct sockaddr_in serverAddress, clientAddress;
+    socklen_t clientLength;
+    pid_t childPid;
+
+    for (int i = 0; i < 3; i++)
+    {
+        childPid = fork();
+
+        if (childPid < 0)
+        {
+            perror("Error forking the process");
+            exit(1);
+        }
+
+        if (childPid == 0)
+        {
+            // This is the child process
+            worker(server_socket);
+
+            // Exit the child process
+            exit(0);
+        }
+    }
+
+    // Close the server socket in the parent process
+    close(server_socket);
+
+    // Wait for the child processes to exit
+    for (int i = 0; i < 3; i++)
+    {
+        wait(NULL);
+    }
+
+    return 0;
 }
