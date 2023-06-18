@@ -11,6 +11,7 @@
 #include "../crud_operations/http_get.h"
 #include "../crud_operations/http_post.h"
 #include "../crud_operations/http_put.h"
+#include "../crud_operations/http_delete.h"
 
 #define MAX_EVENTS 1000
 
@@ -83,7 +84,8 @@ void multiplex_connections(int *arg)
                 int client_socket = events[i].data.fd;
                 // http_get(&client_socket);
                 // http_post(&client_socket);
-                http_put(&client_socket);
+                // http_put(&client_socket);
+                http_delete(&client_socket);
 
                 // Reinitialize event structure
                 event.data.fd = -1;

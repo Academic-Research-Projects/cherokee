@@ -41,12 +41,17 @@ Accept: */*`
 - Execute `curl -X POST -d "The text you want to post" http://localhost:8080`
 - You should see the text in your server terminal
 
-## How to test the HTTP POST request, posting a JSON file
+## How to test the HTTP POST request, posting a .txt file
 - Open another terminal
 - Execute `curl -X POST -d "hello antho" http://localhost:8080/file.txt`
 - You should see the text in your server terminal
 
-## How to test the HTTP PUTT request, posting a JSON file
+## How to test the HTTP PUT request, modifying or adding a .txt file
+- Open another terminal
+- Execute `curl -X PUT -d "this file has been modified" http://localhost:8080/file.txt`
+- You should see the text in your server terminal
+
+## How to test the HTTP DELETE request, deleting a .txt file
 - Open another terminal
 - Execute `curl -X PUT -d "this file has been modified" http://localhost:8080/file.txt`
 - You should see the text in your server terminal
