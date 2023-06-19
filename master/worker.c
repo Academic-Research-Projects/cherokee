@@ -7,7 +7,7 @@
 #include "worker.h"
 #include "thread_pool.h"
 
-#define MAX_THREADS 2
+#define MAX_THREADS 1
 #define MAX_QUEUE_SIZE 10
 
 void handleClientRequest(ThreadPool *threadPool, int clientSocket)
@@ -21,7 +21,7 @@ void handleClientRequest(ThreadPool *threadPool, int clientSocket)
     // TODO Set the task arguments
 
     // Enqueue the task to the thread pool
-    threadPoolEnqueue(&threadPool, task);
+    threadPoolEnqueue(threadPool, task);
 }
 
 int worker(int *server_socket)
@@ -33,7 +33,9 @@ int worker(int *server_socket)
     while (1)
     {
         // Accept a client connection
-        int clientSocket = accept(server_socket, NULL, NULL);
+        // TODO multiplex connections
+
+        int clientSocket = accept(*server_socket, NULL, NULL);
 
         // Handle the client request
         handleClientRequest(&threadPool, clientSocket);

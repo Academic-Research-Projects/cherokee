@@ -5,7 +5,7 @@ LDLIBS = -lcriterion
 TARGET=cherokee
 TEST_TARGET = test_cherokee
 
-SRCS=main.c crud_operations/http_get.c master/multiplex.c master/server_socket.c # liste des fichiers sources
+SRCS=main.c $(wildcard crud_operations/*.c) $(wildcard master/*.c) # liste des fichiers sources
 OBJS=$(SRCS:.c=.o)
 TEST_SRCS = $(wildcard test/*.c) master/server_socket.c
 TEST_OBJS = $(TEST_SRCS:.c=.o)

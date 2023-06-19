@@ -6,6 +6,7 @@
 #include <netinet/in.h>
 
 #include "thread_pool.h"
+#include "../crud_operations/http_get.h"
 
 #define MAX_THREADS 10
 #define MAX_QUEUE_SIZE 100
@@ -35,7 +36,7 @@ void *thread_routine(void *arg)
         pthread_mutex_unlock(&(threadPool->queue->mutex));
 
         // Process the task
-        // ...
+        http_get(&task->clientSocket);
 
         // Close the client socket after processing
         close(task->clientSocket);

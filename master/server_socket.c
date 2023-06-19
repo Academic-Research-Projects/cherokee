@@ -6,8 +6,10 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
-#include "master/worker.h"
+#include "worker.h"
 
 #define LISTEN_LIMIT 200
 
@@ -79,6 +81,7 @@ void fork_server(int *server_socket)
         if (childPid == 0)
         {
             // This is the child process
+            printf("Child process %d\n", getpid());
             worker(server_socket);
 
             // Exit the child process
@@ -87,13 +90,11 @@ void fork_server(int *server_socket)
     }
 
     // Close the server socket in the parent process
-    close(server_socket);
+    close(*server_socket);
 
     // Wait for the child processes to exit
     for (int i = 0; i < 3; i++)
     {
         wait(NULL);
     }
-
-    return 0;
 }

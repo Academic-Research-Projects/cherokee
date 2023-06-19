@@ -9,8 +9,23 @@
 #include <sys/select.h>
 #include <sys/epoll.h>
 #include "../crud_operations/http_get.h"
+#include <signal.h>
 
 #define MAX_EVENTS 1000
+
+int epoll_fd;
+struct epoll_event *events;
+
+// Signal handler for SIGINT
+void handle_sigint(int sig)
+{
+    printf("Received signal %d, shutting down...\n", sig);
+
+    close(epoll_fd);
+    free(events);
+
+    exit(EXIT_SUCCESS);
+}
 
 // Function to multiplex connections
 void multiplex_connections(int *arg)
@@ -19,7 +34,7 @@ void multiplex_connections(int *arg)
     int server_socket = *arg;
 
     // Create epoll instance
-    int epoll_fd = epoll_create1(0);
+    epoll_fd = epoll_create1(0);
     if (epoll_fd == -1)
     {
         perror("epoll_create1");
@@ -37,7 +52,7 @@ void multiplex_connections(int *arg)
     }
 
     // Allocate memory for storing events
-    struct epoll_event *events = malloc(MAX_EVENTS * sizeof(struct epoll_event));
+    events = malloc(MAX_EVENTS * sizeof(struct epoll_event));
     if (events == NULL)
     {
         perror("malloc");
@@ -46,6 +61,9 @@ void multiplex_connections(int *arg)
 
     while (1)
     {
+        // Add signal handler for SIGINT
+        signal(SIGINT, handle_sigint);
+
         int num_events = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
         printf("Number of events: %d\n", num_events);
 
