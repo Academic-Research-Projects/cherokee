@@ -1,6 +1,10 @@
 #include "http/http_parser/http_parser.h"
 #include <stdbool.h>
 #include <stddef.h>
+#include "http/http_request/http_request.h"
+#include <sys/socket.h>
+#include <stdio.h>
+#include <string.h>
 
 bool parse_http_request(int client_socket, HttpRequest *httpRequest)
 {

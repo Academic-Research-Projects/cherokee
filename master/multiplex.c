@@ -11,11 +11,12 @@
 #include "crud_operations/http_get.h"
 #include "http/http_request/http_request.h"
 #include "http/http_response/http_response.h"
+#include "http/http_parser/http_parser.h"
 
 #define MAX_EVENTS 1000
 
 // Function to multiplex connections
-void smultiplex_connections(int *arg)
+void multiplex_connections(int *arg)
 {
     struct sockaddr_in client_addr;
     int server_socket = *arg;
@@ -88,8 +89,9 @@ void smultiplex_connections(int *arg)
                     printf("Error parsing header request\n");
                     continue;
                 }
+                printf("Method: %s\n", http_request.request_line.method);
 
-                handle_request(&http_request, client_socket);
+                // handle_request(&http_request, client_socket);
                 // http_get(&client_socket);
 
                 // Reinitialize event structure
