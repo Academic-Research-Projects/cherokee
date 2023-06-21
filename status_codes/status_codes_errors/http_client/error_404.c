@@ -1,5 +1,6 @@
-#include "error_404.h"
-#include "../../include/http/http_response/http_response.h"
+#include "status_codes/status_codes_errors/http_client/error_404.h"
+#include "http/http_response/http_response.h"
+#include <stddef.h>
 
 char *notFoundMessage(void)
 {

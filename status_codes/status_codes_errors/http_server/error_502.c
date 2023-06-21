@@ -1,5 +1,6 @@
-#include "error_502.h"
-#include "../../include/http/http_response/http_response.h"
+#include "status_codes/status_codes_errors/http_server/error_502.h"
+#include "http/http_response/http_response.h"
+#include <stddef.h>
 
 char *badGatewayMessage(void)
 {

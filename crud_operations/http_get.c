@@ -1,4 +1,4 @@
-#include "http_response.h"
+#include "../include/http/http_response/http_response.h"
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,7 +31,7 @@ void *http_get(int client_socket)
     // default content type
     char *content_type = "text/plain";
 
-    HttpResponse *response;
+    struct HttpResponse *response;
     char *response_str;
 
     // open the requested file
@@ -41,7 +41,7 @@ void *http_get(int client_socket)
 
         // file not found, send 404 response
         createError404(&response);
-        response_str = format_http_response(&respsonse);
+        response_str = format_http_response(&response);
         // write(client_socket, response_str, strlen(response_str));
         // free(response_str);
     }

@@ -1,7 +1,7 @@
 #ifndef SUCCESS_201_H
 #define SUCCESS_201_H
 
-#include "http_response.h"
+#include "http/http_response/http_response.h"
 
 HttpResponse *createCreatedSuccess(HttpResponse *response);
 

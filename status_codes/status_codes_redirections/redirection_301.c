@@ -1,4 +1,6 @@
-#include "redirection_301.h"
+#include "status_codes/status_codes_redirections/redirection_301.h"
+#include "http/http_response/http_response.h"
+#include <stddef.h>
 
 char *movedPermanentlyMessage(void)
 {

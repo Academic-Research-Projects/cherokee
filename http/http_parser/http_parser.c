@@ -1,9 +1,11 @@
-#include "http_parser.h"
+#include "http/http_parser/http_parser.h"
+#include <stdbool.h>
+#include <stddef.h>
 
-bool parse_http_request(int client_socket, struct HttpRequest *httpRequest)
+bool parse_http_request(int client_socket, HttpRequest *httpRequest)
 {
     char buffer[1024];
-    ssize_t bytes_received = recv(client_socket, buffer, sizeof(buffer) - 1, 0);
+    size_t bytes_received = recv(client_socket, buffer, sizeof(buffer) - 1, 0);
 
     if (bytes_received <= 0)
     {
@@ -40,7 +42,7 @@ bool parse_http_request(int client_socket, struct HttpRequest *httpRequest)
         return false;
     }
 
-    httpRequest = > request_line.httpVersion = strdup(token);
+    httpRequest->request_line.httpVersion = strdup(token);
 
     return true;
 }

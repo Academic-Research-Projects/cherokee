@@ -9,7 +9,15 @@
     "files.associations": {
         "inet.h": "c",
         "http_response.h": "c",
-        "success_201.C": "cpp"
+        "success_201.C": "cpp",
+        "error_501.h": "c",
+        "error_504.h": "c",
+        "error_500.h": "c",
+        "error_502.h": "c",
+        "redirection_301.h": "c",
+        "redirection_302.h": "c",
+        "redirection_304.h": "c",
+        "success_200.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

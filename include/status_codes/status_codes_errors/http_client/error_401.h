@@ -1,7 +1,7 @@
 #ifndef ERROR_401_H
 #define ERROR_401_H
 
-#include "http_response.h"
+#include "http/http_response/http_response.h"
 
 HttpResponse *createUnauthorizedError(HttpResponse *response);
 

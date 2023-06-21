@@ -1,7 +1,7 @@
 #ifndef REDIRECTION_304_H
 #define REDIRECTION_304_H
 
-#include "http_response.h"
+#include "http/http_response/http_response.h"
 
 HttpResponse *createNotModifiedRedirection(HttpResponse *response);
 

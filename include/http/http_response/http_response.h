@@ -8,13 +8,13 @@ struct ResponseHeaders
     // struct ResponseHeaders *next; //For multiple header scenario.
 };
 
-struct HttpResponse
+typedef struct HttpResponse
 {
     char *httpVersion;
     int statusCode;
     char *statusText;
     struct ResponseHeaders *headers;
     char *body;
-};
+} HttpResponse;
 
 #endif

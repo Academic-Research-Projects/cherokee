@@ -1,5 +1,6 @@
-#include "error_401.h"
-#include "../../include/http/http_response/http_response.h"
+#include "status_codes/status_codes_errors/http_client/error_401.h"
+#include "http/http_response/http_response.h"
+#include <stddef.h>
 
 char *unauthorizedMessage(void)
 {

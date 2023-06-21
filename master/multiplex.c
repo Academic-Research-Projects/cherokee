@@ -8,9 +8,9 @@
 #include <fcntl.h>
 #include <sys/select.h>
 #include <sys/epoll.h>
-#include "../crud_operations/http_get.h"
-#include "http_request.h"
-#include "http_response.h"
+#include "crud_operations/http_get.h"
+#include "http/http_request/http_request.h"
+#include "http/http_response/http_response.h"
 
 #define MAX_EVENTS 1000
 
