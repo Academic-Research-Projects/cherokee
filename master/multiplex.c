@@ -9,8 +9,9 @@
 #include <sys/select.h>
 #include <sys/epoll.h>
 #include "crud_operations/http_get.h"
-#include "http/http_request/http_request.h"
-#include "http/http_response/http_response.h"
+// #include "http/http_request/http_request.h"
+// #include "http/http_response/http_response.h"
+#include "http/http_handler/http_handler.h"
 
 #define MAX_EVENTS 1000
 
@@ -81,6 +82,8 @@ void multiplex_connections(int *arg)
             {
                 // existing client connection
                 int client_socket = events[i].data.fd;
+                printf("CLIENT SOCKET");
+                printf(client_socket);
 
                 struct HttpRequest http_request;
                 if (!parse_http_request(client_socket, &http_request))
@@ -88,7 +91,7 @@ void multiplex_connections(int *arg)
                     printf("Error parsing header request\n");
                     continue;
                 }
-
+                printf("Handling new request");
                 handle_request(&http_request, client_socket);
                 // http_get(&client_socket);
 

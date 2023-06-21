@@ -17,7 +17,8 @@
         "redirection_301.h": "c",
         "redirection_302.h": "c",
         "redirection_304.h": "c",
-        "success_200.h": "c"
+        "success_200.h": "c",
+        "error_400.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

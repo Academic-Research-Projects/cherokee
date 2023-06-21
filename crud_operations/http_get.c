@@ -1,4 +1,7 @@
-#include "../include/http/http_response/http_response.h"
+#include "http/http_response/http_response.h"
+#include "http/http_request/http_request.h"
+#include "status_codes/status_codes_errors/http_client/error_400.h"
+#include "status_codes/stauts_codes_success/success_200.h"
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,7 +15,7 @@
 #define PORT 8080
 #define BASE_DIRECTORY "test_files"
 
-void *http_get(int client_socket)
+void *http_get(HttpRequest *request, int client_socket)
 {
 
     // read client request
