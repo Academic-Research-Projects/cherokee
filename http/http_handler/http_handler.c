@@ -1,10 +1,14 @@
 #include "http/http_response/http_response.h"
 #include "http/http_request/http_request.h"
+#include "crud_operations/http_get.h"
+#include <stdio.h>
 
 void handle_request(HttpRequest *request, int client_socket)
 {
+    printf("Handling request from method");
     if (strcmp(request->request_line.method, "GET") == 0)
     {
+        printf("Http Get");
         // handle GET request
         http_get(request, client_socket);
     }

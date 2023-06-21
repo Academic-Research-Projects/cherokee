@@ -1,6 +1,9 @@
 #ifndef HTTP_HANDLER_H
 #define HTTP_HANDLER_H
 
-HttpResponse handle_request(HttpRequest *request);
+#include "http/http_request/http_request.h"
+#include "http/http_response/http_response.h"
+
+HttpResponse handle_request(HttpRequest *request, int client_socket);
 
 #endif

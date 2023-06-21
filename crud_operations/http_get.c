@@ -1,8 +1,15 @@
+<<<<<<< HEAD
 #include "../include/http/http_response/http_response.h"
 #include "../include/http/http_request/http_request.h"
 #include "../include/status_codes/status_codes_errors/http_client/error_404.h"
 #include "../include/http/http_formatter/http_formatter.h"
 #include "../include/http/http_parser/http_parser.h"
+=======
+#include "http/http_response/http_response.h"
+#include "http/http_request/http_request.h"
+#include "status_codes/status_codes_errors/http_client/error_400.h"
+#include "status_codes/stauts_codes_success/success_200.h"
+>>>>>>> 82ac0c757d12d1a78b2d8b1419bf6b38aef24ba1
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,7 +23,7 @@
 #define PORT 8080
 #define BASE_DIRECTORY "test_files"
 
-void *http_get(int client_socket)
+void *http_get(HttpRequest *request, int client_socket)
 {
 
     // read client request

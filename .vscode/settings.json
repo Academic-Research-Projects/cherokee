@@ -18,8 +18,13 @@
         "redirection_302.h": "c",
         "redirection_304.h": "c",
         "success_200.h": "c",
+<<<<<<< HEAD
         "http_request.h": "c",
         "error_404.h": "c"
+=======
+        "error_400.h": "c",
+        "http_get.h": "c"
+>>>>>>> 82ac0c757d12d1a78b2d8b1419bf6b38aef24ba1
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

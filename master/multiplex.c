@@ -83,7 +83,7 @@ void multiplex_connections(int *arg)
                 // existing client connection
                 int client_socket = events[i].data.fd;
 
-                struct HttpRequest http_request;
+                struct HttpRequest *http_request;
                 if (!parse_http_request(client_socket, &http_request))
                 {
                     printf("Error parsing header request\n");
