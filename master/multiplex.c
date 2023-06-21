@@ -83,13 +83,15 @@ void multiplex_connections(int *arg)
                 // existing client connection
                 int client_socket = events[i].data.fd;
 
-                struct HttpRequest *http_request;
-                if (!parse_http_request(client_socket, &http_request))
+                struct HttpRequest *http_request = malloc(sizeof(struct HttpRequest));
+                if (!parse_http_request(client_socket, http_request))
                 {
                     printf("Error parsing header request\n");
                     continue;
                 }
-                printf("Method: %s\n", http_request.request_line.method);
+                printf("Method: %s\n", http_request->request_line.method);
+                printf("Target: %s\n", http_request->request_line.requestTarget);
+                printf("Version: %s\n", http_request->request_line.httpVersion);
 
                 // handle_request(&http_request, client_socket);
                 // http_get(&client_socket);

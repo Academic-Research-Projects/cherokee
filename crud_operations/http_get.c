@@ -1,15 +1,12 @@
-<<<<<<< HEAD
 #include "../include/http/http_response/http_response.h"
 #include "../include/http/http_request/http_request.h"
 #include "../include/status_codes/status_codes_errors/http_client/error_404.h"
 #include "../include/http/http_formatter/http_formatter.h"
 #include "../include/http/http_parser/http_parser.h"
-=======
 #include "http/http_response/http_response.h"
 #include "http/http_request/http_request.h"
 #include "status_codes/status_codes_errors/http_client/error_400.h"
 #include "status_codes/stauts_codes_success/success_200.h"
->>>>>>> 82ac0c757d12d1a78b2d8b1419bf6b38aef24ba1
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -38,6 +35,9 @@ void *http_get(HttpRequest *request, int client_socket)
     // construct the complete file path
     char file_path[512] = {0};
     snprintf(file_path, sizeof(file_path), "%s/%s", BASE_DIRECTORY, filename);
+
+    // print request
+    printf("Request: %s\n", request->request_line.requestTarget);
 
     // // default content type
     // char *content_type = "text/plain";
