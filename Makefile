@@ -6,8 +6,11 @@ crud_operations/http_get.c \
 master/multiplex.c \
 master/server_socket.c \
 http/http_parser/http_parser.c \
-# http/http_formatter/http_formatter.c \
-# http/http_handler/http_handler.c \
+http/http_formatter/http_formatter.c \
+status_codes/status_codes_errors/http_client/error_404.c \
+http/http_response/http_response.c \
+http/http_handler/http_handler.c \
+status_codes/status_codes_success/success_200.c \
 # http/http_request/http_request.c \
 # http/http_request/headers/headers.c \
 # http/http_request/request_line/request_line.c \
