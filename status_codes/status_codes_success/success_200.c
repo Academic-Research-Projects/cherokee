@@ -1,6 +1,7 @@
 #include "status_codes/stauts_codes_success/success_200.h"
 #include "http/http_response/http_response.h"
 #include <stddef.h>
+#include <string.h>
 
 char *successMessage(void)
 {
@@ -8,6 +9,7 @@ char *successMessage(void)
 }
 
 HttpResponse *createSuccess200(HttpResponse *response, char *content_type)
+//HttpResponse *createSuccess200(HttpResponse *response)
 {
     response->httpVersion = strdup("HTTP/1.1");
     response->statusCode = 200;

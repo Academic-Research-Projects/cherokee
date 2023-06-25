@@ -3,6 +3,7 @@
 
 #include "http/http_response/http_response.h"
 
-HttpResponse *createNotFoundError(HttpResponse *response);
+// HttpResponse *createNotFoundError(HttpResponse *response);
+HttpResponse *createError404(HttpResponse *response);
 
 #endif

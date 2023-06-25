@@ -3,6 +3,8 @@
 
 #include "http/http_response/http_response.h"
 
-HttpResponse *createOkSuccess(HttpResponse *response);
+// HttpResponse *createSuccess200(HttpResponse *response);
+HttpResponse *createSuccess200(HttpResponse *response, char *content_type);
+// HttpResponse *createSuccess200(HttpResponse *response);
 
 #endif

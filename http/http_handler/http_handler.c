@@ -2,15 +2,16 @@
 #include "http/http_request/http_request.h"
 #include "crud_operations/http_get.h"
 #include <stdio.h>
+#include <string.h>
 
-void handle_request(HttpRequest *request, int client_socket)
+void *handle_request(HttpRequest *request, int client_socket)
 {
     printf("Handling request from method");
     if (strcmp(request->request_line.method, "GET") == 0)
     {
         printf("Http Get");
         // handle GET request
-        http_get(request, client_socket);
+        http_get(request, &client_socket);
     }
     // else if (strcmp(request->request_line.method, "POST") == 0)
     // {
@@ -32,4 +33,5 @@ void handle_request(HttpRequest *request, int client_socket)
     //     // handle invalid request
     //     // response = http_invalid_request();
     // }
+    return NULL;
 }
