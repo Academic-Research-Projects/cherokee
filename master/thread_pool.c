@@ -39,11 +39,11 @@ void *thread_routine(void *arg)
         printf("Processing client request : %d --- in process %d --- in thread : %ld\n", task->clientSocket, getpid(), pthread_self());
         http_get(&task->clientSocket);
 
-        // Close the client socket after processing
-        close(task->clientSocket);
+        // // Close the client socket after processing
+        // close(task->clientSocket);
 
-        // Free the task
-        free(task);
+        // // Free the task
+        // free(task);
     }
 
     return NULL;
@@ -73,7 +73,6 @@ void threadPoolInit(ThreadPool *threadPool, int numThreads)
 
 void threadPoolEnqueue(ThreadPool *threadPool, Task *task)
 {
-    printf("Enqueuing task : %d\n", task->clientSocket);
     pthread_mutex_lock(&(threadPool->queue->mutex));
 
     // Wait if the queue is full

@@ -18,7 +18,6 @@ void *http_get(void *socket_desc)
     // read client request
     char buffer[1024] = {0};
     read(client_socket, buffer, 1024);
-    printf("%s\n", buffer);
 
     // extract the requested file name from the client request
     char filename[256] = {0};
