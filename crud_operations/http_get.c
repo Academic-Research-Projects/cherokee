@@ -68,22 +68,29 @@ void *http_get(HttpRequest *request, int client_socket)
         createSuccess200(response, content_type);
         response_str = format_http_response(response);
 
+        printf("Response: %s\n", response_str);
+
         write(client_socket, response_str, strlen(response_str));
+        
         free(response_str);
+        free(response->headers);
+        free(response);
 
         // Read and send the file contents
         char file_buffer[1024];
         ssize_t bytes_read;
+        
+        printf("Writing request to client socket");
+
         while ((bytes_read = read(file_fd, file_buffer, sizeof(file_buffer))) > 0)
         {
-            printf("Writing request to client socket");
             write(client_socket, file_buffer, bytes_read);
         }
 
+        
+
         close(file_fd);
     }
-    free(response->headers);
-    free(response);
-
+    close(client_socket);
     return NULL;
 }

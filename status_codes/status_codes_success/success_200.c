@@ -14,7 +14,6 @@ HttpResponse *createSuccess200(HttpResponse *response, char *content_type)
 {
     //allocating memory
     response->headers = malloc(sizeof(struct ResponseHeaders));
-
     response->httpVersion = strdup("HTTP/1.1");
     response->statusCode = 200;
     response->statusText = successMessage();

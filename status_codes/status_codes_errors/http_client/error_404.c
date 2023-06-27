@@ -10,6 +10,7 @@ char *notFoundMessage(void)
 
 HttpResponse *createError404(HttpResponse *response)
 {
+    response->headers = malloc(sizeof(struct ResponseHeaders));
     response->httpVersion = strdup("HTTP/1.1");
     response->statusCode = 404;
     response->statusText = notFoundMessage();
