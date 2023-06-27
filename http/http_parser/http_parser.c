@@ -1,4 +1,3 @@
-#include "http/http_parser/http_parser.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include "http/http_request/http_request.h"

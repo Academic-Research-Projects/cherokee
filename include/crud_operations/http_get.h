@@ -3,6 +3,6 @@
 
 #include "http/http_request/http_request.h"
 
-void *http_get(HttpRequest *request, int *client_socket);
+void *http_get(HttpRequest *request, int client_socket);
 
 #endif

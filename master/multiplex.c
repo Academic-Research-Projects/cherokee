@@ -95,12 +95,14 @@ void multiplex_connections(int *arg)
                 // printf("Target: %s\n", http_request->request_line.requestTarget);
                 // printf("Version: %s\n", http_request->request_line.httpVersion);
 
-                // handle_request(http_request, client_socket);
-                http_get(http_request, &client_socket);
+                handle_request(http_request, client_socket);
+                // http_get(http_request, &client_socket);
+                free(http_request);
 
                 // Reinitialize event structure
                 event.data.fd = -1;
                 event.events = 0;
+
                 // }
             }
         }

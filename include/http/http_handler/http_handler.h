@@ -4,6 +4,6 @@
 #include "http/http_request/http_request.h"
 #include "http/http_response/http_response.h"
 
-HttpResponse handle_request(HttpRequest *request, int client_socket);
+void *handle_request(HttpRequest *request, int client_socket);
 
 #endif

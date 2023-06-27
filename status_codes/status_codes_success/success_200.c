@@ -2,6 +2,7 @@
 #include "http/http_response/http_response.h"
 #include <stddef.h>
 #include <string.h>
+#include <stdlib.h>
 
 char *successMessage(void)
 {
@@ -11,6 +12,9 @@ char *successMessage(void)
 HttpResponse *createSuccess200(HttpResponse *response, char *content_type)
 //HttpResponse *createSuccess200(HttpResponse *response)
 {
+    //allocating memory
+    response->headers = malloc(sizeof(struct ResponseHeaders));
+
     response->httpVersion = strdup("HTTP/1.1");
     response->statusCode = 200;
     response->statusText = successMessage();
