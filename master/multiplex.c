@@ -8,7 +8,16 @@
 #include <fcntl.h>
 #include <sys/select.h>
 #include <sys/epoll.h>
-#include "../crud_operations/http_get.h"
+#include "../crud_operations/http_head.h"
+// #include "../crud_operations/http_post.h"
+// #include "../crud_operations/http_put.h"
+// #include "../crud_operations/http_delete.h"
+#include "crud_operations/http_get.h"
+#include "crud_operations/http_post.h"
+#include "http/http_request/http_request.h"
+#include "http/http_response/http_response.h"
+#include "http/http_parser/http_parser.h"
+#include "http/http_handler/http_handler.h"
 
 #define MAX_EVENTS 1000
 
@@ -79,11 +88,31 @@ void multiplex_connections(int *arg)
             {
                 // existing client connection
                 int client_socket = events[i].data.fd;
-                http_get(&client_socket);
+                printf("Client socket: %d\n", client_socket);
+
+                struct HttpRequest *http_request = malloc(sizeof(struct HttpRequest));
+                if (!parse_http_request(client_socket, http_request))
+                {
+                    printf("Error parsing header request\n");
+                    continue;
+                }
+                // printf("Method: %s\n", http_request->request_line.method);
+                // printf("Target: %s\n", http_request->request_line.requestTarget);
+                // printf("Version: %s\n", http_request->request_line.httpVersion);
+
+                handle_request(http_request, client_socket);
+                // http_get(http_request, &client_socket);
+                free(http_request);
+                // http_get(&client_socket);
+                // http_head(&client_socket);
+                // http_post(&client_socket);
+                // http_put(&client_socket);
+                // http_delete(&client_socket);
 
                 // Reinitialize event structure
                 event.data.fd = -1;
                 event.events = 0;
+
                 // }
             }
         }

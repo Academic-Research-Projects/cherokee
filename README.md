@@ -27,7 +27,7 @@ login: blanch_b loizag_g utzman_f baudet_c
 
 ## How to test
 - Open another terminal
-- Execute `curl http://localhost:8080`
+- Execute `curl http://localhost:8080/zoubisou.json`
 - You should see a "Hello, World" in the client terminal
 - This is the output expected from the server, in your server terminal :
 
@@ -35,3 +35,32 @@ login: blanch_b loizag_g utzman_f baudet_c
 Host: localhost:8080
 User-Agent: curl/7.74.0
 Accept: */*`
+
+## How to test the HTTP POST request, posting a simple text
+- Open another terminal
+- Execute `curl -X POST -d "The text you want to post" http://localhost:8080`
+- You should see the text in your server terminal
+
+## How to test the HTTP POST request, posting a .txt file
+- Open another terminal
+- Execute `curl -X POST -d "hello antho" http://localhost:8080/file.txt`
+- You should see the text in your server terminal
+
+## How to test the HTTP PUT request, modifying or adding a .txt file
+- Open another terminal
+- Execute `curl -X PUT -d "this file has been modified" http://localhost:8080/file.txt`
+- You should see the text in your server terminal
+
+## How to test the HTTP DELETE request, deleting a .txt file
+- Open another terminal
+- Execute `curl -X PUT -d "this file has been modified" http://localhost:8080/file.txt`
+- You should see the text in your server terminal
+
+## WORK IN PROGRESS
+- Code compiles
+- J'ai essayé de faire marcher la fonction createError404(response), mais je me tape un segfault. file_fd donne autre valeur que -1 quand le fichier n'existe pas, je ne comprends pas pourquoi.
+- Comme cela ne marchait pas, j'ai essayé de faire marcher la fonction createSuccess200(response, content_type). Toujours de segfault, le code ne rentre pas dans la condition if.
+- Pour tester la fonction createError404(response), j'exécute depuis le client un simple "curl http://localhost:8080/hola.html (ce fichier n'existe pas donc la valeur de fd devrait être -1, or ça donne toujours un valeur positif)".
+- Pour tester la fonction createSuccess200(response, content_type)  j'exécute depuis le client un simple "curl http://localhost:8080/zoubisou.json, ce fichier existe et se trouve dans le repertoire test_files
+- REMARQUE : à chaque fois qu'on veut tester une fonction, il faut décommenter les fichiers nécessaires sur le Makefile.
+- REMARQUE 1 : moi j'ai bougé entre multiplex.c + http_get.c + les fichiers avec les fonctions correspondantes à tester (*.h et *.c respectivement)
