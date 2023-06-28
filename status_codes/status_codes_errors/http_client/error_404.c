@@ -12,11 +12,11 @@ char *notFoundMessage(void)
 HttpResponse *createError404(HttpResponse *response)
 {
     response->headers = malloc(sizeof(struct ResponseHeaders));
+    response->headers->name = strdup("Content-Type");
+    response->headers->value = strdup("text/plain");
     response->httpVersion = strdup("HTTP/1.1");
     response->statusCode = 404;
     response->statusText = notFoundMessage();
-    response->headers->name = NULL;
-    response->headers->value = NULL;
-    response->body = NULL;
+    response->body = strdup("404 not found\n");
     return response;
 }

@@ -47,6 +47,7 @@ void *http_get(HttpRequest *request, int client_socket)
         response_str = format_http_response(response);
         printf("Response: %s\n", response_str);
         write(client_socket, response_str, strlen(response_str));
+        // write(client_socket, response->body, strlen(response->body));
     }
     else
     {
@@ -71,7 +72,7 @@ void *http_get(HttpRequest *request, int client_socket)
         printf("Response: %s\n", response_str);
 
         write(client_socket, response_str, strlen(response_str));
-        
+
         free(response_str);
         free(response->headers);
         free(response);
@@ -79,15 +80,13 @@ void *http_get(HttpRequest *request, int client_socket)
         // Read and send the file contents
         char file_buffer[1024];
         ssize_t bytes_read;
-        
+
         printf("Writing request to client socket");
 
         while ((bytes_read = read(file_fd, file_buffer, sizeof(file_buffer))) > 0)
         {
             write(client_socket, file_buffer, bytes_read);
         }
-
-        
 
         close(file_fd);
     }
