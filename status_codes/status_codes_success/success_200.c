@@ -19,6 +19,6 @@ HttpResponse *createSuccess200(HttpResponse *response, char *content_type)
     response->statusText = successMessage();
     response->headers->name = "Content-Type";
     response->headers->value = content_type;
-    response->body = NULL;
+    response->body = strdup(successMessage());
     return response;
 }

@@ -104,7 +104,7 @@ void multiplex_connections(int *arg)
                 // http_get(http_request, &client_socket);
                 free(http_request);
                 // http_get(&client_socket);
-                http_head(&client_socket);
+                // http_head(&client_socket);
                 // http_post(&client_socket);
                 // http_put(&client_socket);
                 // http_delete(&client_socket);

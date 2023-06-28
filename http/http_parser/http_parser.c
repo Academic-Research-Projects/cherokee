@@ -10,6 +10,7 @@ bool parse_http_request(int client_socket, HttpRequest *httpRequest)
     char buffer[1024];
     size_t bytes_received = recv(client_socket, buffer, sizeof(buffer) - 1, 0);
 
+    printf(buffer);
     if (bytes_received <= 0)
     {
         perror("recv");

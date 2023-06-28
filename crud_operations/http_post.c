@@ -25,25 +25,15 @@
 
 void *http_post(HttpRequest *request, int client_socket)
 {
+
+    char *request_target = request->request_line.requestTarget;
+    char *request_body = request->body;
+
     // extract the file descriptor (socket descriptor) of the client connection from a void pointer.
-    int client_socket = *(int *)socket_desc;
-    printf("%d\n", client_socket);
 
     // read client request
-    char buffer[1024] = {0}; // buffer c'est un string (tableau)
-    ssize_t client_request;
-    client_request = read(client_socket, buffer, 1024); // nombre de bytes dans le buffer du file descriptor
-    printf("%ld\n", client_request);
-    if (client_request < 0)
-    {
-        perror("read error");
-    }
-    printf("%s\n", buffer);
-
     // extract the requested file name from the client request
-    char filename[256] = {0};             // filename c'est un tableau
-    sscanf(buffer, "POST /%s", filename); // sscanf() parse data from a string and store the extracted value into variables
-
+    char filename[256] = {0}; // filename c'est un tableau
     // construct the complete file path
     char file_path[FILE_PATH_SIZE] = {0};
     snprintf(file_path, sizeof(file_path), "%s/%s", BASE_DIRECTORY, filename);
@@ -78,46 +68,46 @@ void *http_post(HttpRequest *request, int client_socket)
     }
     else
     {
-        // read the request body
-        if (client_request > 0)
-        {
-            // Null-terminate the buffer to treat it as a string
-            buffer[client_request] = '\0';
 
-            char *request_body = strstr(buffer, "\r\n\r\n") + 4;
-            int file_fd = open(file_path, O_RDWR | O_CREAT | S_IRWXU, 0644);
-            printf("%d\n", file_fd);
-            puts("after open");
-            if (file_fd == -1)
+        // Null-terminate the buffer to treat it as a string
+        int file_fd = open(file_path, O_RDWR | O_CREAT | S_IRWXU, 0644);
+        printf("%d\n", file_fd);
+        puts("after open");
+        if (file_fd == -1)
+        {
+            puts("error");
+            // file not found, send 404 response
+            perror("open failed");
+            response = createError404(response);
+            response_str = format_http_response(response);
+            write(client_socket, response_str, strlen(response_str));
+        }
+        else
+        {
+            if (!request_body)
             {
-                puts("error");
-                // file not found, send 404 response
-                perror("open failed");
-                response = createError404(response);
-                response_str = format_http_response(response);
-                printf("Response: %s\n", response_str);
-                write(client_socket, response_str, strlen(response_str));
-                write(client_socket, not_found_response, strlen(not_found_response));
+                puts("aja");
             }
-            else
+            int status = write(file_fd, request_body, strlen(request_body));
+            printf("%d\n", status);
+            if (status == -1)
             {
-                if (!request_body)
-                {
-                    puts("aja");
-                }
-                int status = write(file_fd, request_body, strlen(request_body));
-                printf("%d\n", status);
-                if (status == -1)
-                {
-                    perror("write failed");
-                    return NULL;
-                }
-                // send response headers
-                char response[RESPONSE_BUFFER_SIZE];
-                snprintf(response, RESPONSE_BUFFER_SIZE, "HTTP/1.1 200 OK\r\nContent-Type: %s\r\n\r\n%s", content_type, "Your request have been posted\n");
-                write(client_socket, response, strlen(response));
-                close(file_fd);
+                perror("write failed");
+                return NULL;
             }
+            // send response headers
+
+            createSuccess200(response, "text/plain");
+            response_str = format_http_response(response);
+
+            printf("Response: %s\n", response_str);
+
+            write(client_socket, response, strlen(response_str));
+
+            free(response_str);
+            free(response->headers);
+            free(response);
+            close(file_fd);
         }
     }
     // close socket and free memory

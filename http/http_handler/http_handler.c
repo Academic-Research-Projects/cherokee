@@ -13,11 +13,11 @@ void *handle_request(HttpRequest *request, int client_socket)
         // handle GET request
         http_get(request, client_socket);
     }
-    else if (strcmp(request->request_line.method, "POST") == 0)
-    {
-        // handle POST request
-        http_post(request, client_socket);
-    }
+    // else if (strcmp(request->request_line.method, "POST") == 0)
+    // {
+    //     // handle POST request
+    //     http_post(request, client_socket);
+    // }
     // else if (strcmp(request->request_line.method, "PUT") == 0)
     // {
     //     // handle PUT request
