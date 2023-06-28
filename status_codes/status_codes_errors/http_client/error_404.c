@@ -2,6 +2,7 @@
 #include "http/http_response/http_response.h"
 #include <stddef.h>
 #include <string.h>
+#include <stdlib.h>
 
 char *notFoundMessage(void)
 {
