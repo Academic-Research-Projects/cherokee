@@ -11,7 +11,6 @@ login: blanch_b loizag_g utzman_f baudet_c
 - Criterion : https://github.com/Snaipe/Criterion#downloads 
     - Ubuntu (>=21.04) / Debian (>=11) : `sudo apt-get install libcriterion-dev`
     - Other : https://criterion.readthedocs.io/en/latest/setup.html#installation
-- Install apache bench : `sudo apt install apache2-utils`
 
 ## How to use
 - Compile the program : `make`
@@ -35,7 +34,6 @@ Host: localhost:8080
 User-Agent: curl/7.74.0
 Accept: */*`
 
-
 ## How to make Criterion unit tests
 - Create a file named `test_*.c` in the `test` folder or use an existing one for the same purpose
 - Write your tests in this file
@@ -48,3 +46,9 @@ Accept: */*`
         - documentation : https://criterion.readthedocs.io/en/latest/assert.html
 - Group tests by purpose/features in different files
 - You can use the template as an example : `test/test_template.c` or `test/test_server_socket.c`
+
+## Useful commands
+- List all running process : `ps -aux | less`
+- List process with open ports : `sudo netstat -tulpn`
+- Display process with specific port : `sudo lsof -i -P -n | grep <PORT>`
+- Kill a process : `sudo kill -9 <PID>`
