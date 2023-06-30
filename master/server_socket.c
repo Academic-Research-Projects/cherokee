@@ -9,7 +9,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-#include "worker.h"
+#include "master/worker.h"
 
 #define LISTEN_LIMIT 200
 

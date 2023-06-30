@@ -7,10 +7,10 @@
 #include <sys/epoll.h>
 #include <signal.h>
 #include <arpa/inet.h>
-#include "worker.h"
-#include "thread_pool.h"
-#include "multiplex.h"
 #include <stdbool.h>
+
+#include "master/worker.h"
+#include "master/thread_pool.h"
 
 #define MAX_THREADS 10
 #define MAX_QUEUE_SIZE 10

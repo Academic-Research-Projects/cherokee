@@ -1,47 +1,59 @@
-#include <pthread.h>
+#include "../include/http/http_response/http_response.h"
+#include "../include/http/http_request/http_request.h"
+#include "../include/status_codes/status_codes_errors/http_client/error_404.h"
+#include "../include/http/http_formatter/http_formatter.h"
+#include "../include/http/http_parser/http_parser.h"
+#include "http/http_response/http_response.h"
+#include "http/http_request/http_request.h"
+#include "status_codes/status_codes_errors/http_client/error_400.h"
+#include "status_codes/stauts_codes_success/success_200.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
-#include <arpa/inet.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 
-#define PORT 8080
 #define BASE_DIRECTORY "test_files"
 
-void *http_get(void *socket_desc)
+void *http_get(HttpRequest *request, int client_socket)
 {
-    int client_socket = *(int *)socket_desc;
+    // Get the requested file name from the HttpRequest
+    char *request_target = request->request_line.requestTarget;
 
-    // read client request
-    char buffer[1024] = {0};
-    read(client_socket, buffer, 1024);
-
-    // extract the requested file name from the client request
-    char filename[256] = {0};
-    sscanf(buffer, "GET /%s", filename);
-
-    // construct the complete file path
+    // Construct the complete file path
     char file_path[512] = {0};
-    snprintf(file_path, sizeof(file_path), "%s/%s", BASE_DIRECTORY, filename);
+    snprintf(file_path, sizeof(file_path), "%s/%s", BASE_DIRECTORY, request_target);
 
-    // default content type
+    // Print request
+    printf("Request: %s\n", request_target);
+
+    // Default content type
     char *content_type = "text/plain";
 
-    // open the requested file
+    struct HttpResponse *response = malloc(sizeof(struct HttpResponse));
+    char *response_str;
+
+    // Open the requested file
     int file_fd = open(file_path, O_RDONLY);
+    printf("File descriptor: %d\n", file_fd);
+    printf("File path: %s\n", file_path);
+
     if (file_fd == -1)
     {
-        // file not found, send 404 response
-        char *response = "HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\n\r\nFile not found\r\n";
-        write(client_socket, response, strlen(response));
+        // File not found, send 404 response
+        response = createError404(response);
+        response_str = format_http_response(response);
+        printf("Response: %s\n", response_str);
+        write(client_socket, response_str, strlen(response_str));
+        // write(client_socket, response->body, strlen(response->body));
     }
     else
     {
-        // determine the content type based on the file extension
-        char *file_extension = strrchr(filename, '.');
+        // Determine the content type based on the file extension
+        char *file_extension = strrchr(request_target, '.');
+
         if (file_extension)
         {
             if (strcmp(file_extension, ".html") == 0)
@@ -54,12 +66,23 @@ void *http_get(void *socket_desc)
                 content_type = "image/png";
         }
 
-        // send response headers
-        dprintf(client_socket, "HTTP/1.1 200 OK\r\nContent-Type: %s\r\n\r\n", content_type);
+        createSuccess200(response, content_type);
+        response_str = format_http_response(response);
 
-        // read and send the file contents
+        printf("Response: %s\n", response_str);
+
+        write(client_socket, response_str, strlen(response_str));
+
+        free(response_str);
+        free(response->headers);
+        free(response);
+
+        // Read and send the file contents
         char file_buffer[1024];
         ssize_t bytes_read;
+
+        printf("Writing request to client socket");
+
         while ((bytes_read = read(file_fd, file_buffer, sizeof(file_buffer))) > 0)
         {
             write(client_socket, file_buffer, bytes_read);
@@ -69,8 +92,9 @@ void *http_get(void *socket_desc)
     }
 
     // close socket and free memory
-    close(client_socket);
+    // close(client_socket);
     // free(socket_desc);
 
+    close(client_socket);
     return NULL;
 }

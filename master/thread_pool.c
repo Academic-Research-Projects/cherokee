@@ -5,8 +5,17 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
-#include "thread_pool.h"
-#include "../crud_operations/http_get.h"
+#include "master/thread_pool.h"
+#include "../crud_operations/http_head.h"
+// #include "../crud_operations/http_post.h"
+// #include "../crud_operations/http_put.h"
+// #include "../crud_operations/http_delete.h"
+#include "crud_operations/http_get.h"
+#include "crud_operations/http_post.h"
+#include "http/http_request/http_request.h"
+#include "http/http_response/http_response.h"
+#include "http/http_parser/http_parser.h"
+#include "http/http_handler/http_handler.h"
 
 #define MAX_THREADS 10
 #define MAX_QUEUE_SIZE 100
@@ -37,13 +46,18 @@ void *thread_routine(void *arg)
 
         // Process the task
         printf("Processing client request : %d --- in process %d --- in thread : %ld\n", task->clientSocket, getpid(), pthread_self());
-        http_get(&task->clientSocket);
 
-        // // Close the client socket after processing
-        // close(task->clientSocket);
+        // Create the request object
+        struct HttpRequest *http_request = malloc(sizeof(struct HttpRequest));
+        if (!parse_http_request(task->clientSocket, http_request))
+        {
+            printf("Error parsing header request\n");
+            continue;
+        }
 
-        // // Free the task
-        // free(task);
+        handle_request(http_request, task->clientSocket);
+
+        free(http_request);
     }
 
     return NULL;

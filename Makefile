@@ -1,11 +1,16 @@
 CC=gcc
-CFLAGS=-Wall -Wextra -pthread -g
-LDLIBS = -lcriterion
-
+CFLAGS=-Wall -Wextra -pthread -g -Iinclude
+LDLIBS=-lcriterion
 TARGET=cherokee
-TEST_TARGET = test_cherokee
 
-SRCS=main.c $(wildcard crud_operations/*.c) $(wildcard master/*.c) # liste des fichiers sources
+# liste des fichiers sources
+SRCS=main.c \
+$(wildcard master/*.c) \
+$(wildcard crud_operations/*.c) \
+$(wildcard http/*/*.c) \
+status_codes/status_codes_success/success_200.c \
+status_codes/status_codes_errors/http_client/error_404.c
+
 OBJS=$(SRCS:.c=.o)
 TEST_SRCS = $(wildcard test/*.c) $(wildcard master/*.c) $(wildcard crud_operations/*.c)
 TEST_OBJS = $(TEST_SRCS:.c=.o)
@@ -15,7 +20,7 @@ TEST_OBJS = $(TEST_SRCS:.c=.o)
 all:$(TARGET)
 
 $(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) -o $(TARGET) 
+	$(CC) $(CFLAGS) $(OBJS) -o $(TARGET)
 
 $(TEST_TARGET): $(TEST_OBJS)
 	$(CC) $(CFLAGS) $(TEST_OBJS) -o $(TEST_TARGET) $(LDLIBS)

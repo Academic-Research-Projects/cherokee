@@ -7,7 +7,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <fcntl.h>
-#include "../master/server_socket.h"
+
+#include "master/server_socket.h"
 
 Test(test_create_socket, returns_valid_socket_descriptor)
 {
