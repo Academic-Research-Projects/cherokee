@@ -4,19 +4,19 @@
 #include <string.h>
 #include <stdlib.h>
 
-char *unauthorizedMessage(void)
+char *methodNodAllowedMessage(void)
 {
-    return "Unauthorized";
+    return "Method Not Allowed";
 }
 
-HttpResponse *createError401(HttpResponse *response)
+HttpResponse *createError405(HttpResponse *response)
 {
     response->headers = malloc(sizeof(struct ResponseHeaders));
     response->headers->name = "Content-Type";
     response->headers->value = "text/plain";
     response->httpVersion = "HTTP/1.1";
-    response->statusCode = 401;
-    response->statusText = unauthorizedMessage();
-    response->body = strdup(unauthorizedMessage());
+    response->statusCode = 405;
+    response->statusText = methodNodAllowedMessage();
+    response->body = strdup(methodNodAllowedMessage());
     return response;
 }

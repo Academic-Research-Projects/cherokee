@@ -1,6 +1,8 @@
-#include "status_codes/status_codes_errors/http_client/error_403.h"
+#include "status_codes/http_status_codes.h"
 #include "http/http_response/http_response.h"
 #include <stddef.h>
+#include <string.h>
+#include <stdlib.h>
 
 char *forbiddenMessage(void)
 {
@@ -9,10 +11,12 @@ char *forbiddenMessage(void)
 
 HttpResponse *createError403(HttpResponse *response)
 {
-    response->httpVersion = strdup("HTTP/1.1");
+    response->headers = malloc(sizeof(struct ResponseHeaders));
+    response->headers->name = "Content-Type";
+    response->headers->value = "text/plain";
+    response->httpVersion = "HTTP/1.1";
     response->statusCode = 403;
     response->statusText = forbiddenMessage();
-    response->headers = NULL;
-    response->body = NULL;
+    response->body = strdup(forbiddenMessage());
     return response;
 }

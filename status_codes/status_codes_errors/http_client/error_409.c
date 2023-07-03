@@ -4,19 +4,19 @@
 #include <string.h>
 #include <stdlib.h>
 
-char *unauthorizedMessage(void)
+char *conflictMessage(void)
 {
-    return "Unauthorized";
+    return "Conflict";
 }
 
-HttpResponse *createError401(HttpResponse *response)
+HttpResponse *createError409(HttpResponse *response)
 {
     response->headers = malloc(sizeof(struct ResponseHeaders));
     response->headers->name = "Content-Type";
     response->headers->value = "text/plain";
     response->httpVersion = "HTTP/1.1";
-    response->statusCode = 401;
-    response->statusText = unauthorizedMessage();
-    response->body = strdup(unauthorizedMessage());
+    response->statusCode = 409;
+    response->statusText = conflictMessage();
+    response->body = strdup(conflictMessage());
     return response;
 }
