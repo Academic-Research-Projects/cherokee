@@ -2,6 +2,7 @@
 #include "http/http_request/http_request.h"
 #include "crud_operations/http_get.h"
 #include "crud_operations/http_post.h"
+#include "crud_operations/http_put.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -18,11 +19,11 @@ void *handle_request(HttpRequest *request, int client_socket)
         // handle POST request
         http_post(request, client_socket);
     }
-    // else if (strcmp(request->request_line.method, "PUT") == 0)
-    // {
-    //     // handle PUT request
-    //     http_put(request, client_socket);
-    // }
+    else if (strcmp(request->request_line.method, "PUT") == 0)
+    {
+        // handle PUT request
+        http_put(request, client_socket);
+    }
     // else if (strcmp(request->request_line.method, "DELETE") == 0)
     // {
     //     // handle DELETE request

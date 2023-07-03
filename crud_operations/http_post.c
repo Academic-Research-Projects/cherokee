@@ -69,12 +69,14 @@ void *http_post(HttpRequest *request, int client_socket)
         }
         else
         {
-            printf("Request body: %s\n", request_body);
-            int status = write(file_fd, request_body, strlen(request_body));
-            if (status == -1)
+            if (request_body != NULL)
             {
-                perror("write failed");
-                return NULL;
+                int status = write(file_fd, request_body, strlen(request_body));
+                if (status == -1)
+                {
+                    perror("write failed");
+                    return NULL;
+                }
             }
 
             createSuccess200(response, content_type);
