@@ -22,12 +22,10 @@
 void *http_post(HttpRequest *request, int client_socket)
 {
     char *request_body = request->body;
-
     // extract the requested file name from the client request
     char *request_target = request->request_line.requestTarget;
     char filename[256] = {0};
     sscanf(request_target, "/%s", filename);
-
     // construct the complete file path
     char file_path[FILE_PATH_SIZE] = {0};
     snprintf(file_path, sizeof(file_path), "%s/%s", BASE_DIRECTORY, filename);
@@ -50,7 +48,7 @@ void *http_post(HttpRequest *request, int client_socket)
         else if (strcmp(file_extension, ".png") == 0)
             content_type = "image/png";
         else if (strcmp(file_extension, ".txt") == 0)
-            content_type = "text/txt";
+            content_type = "text/txt";  
     }
 
     if (access(file_path, F_OK) != -1)
@@ -71,6 +69,7 @@ void *http_post(HttpRequest *request, int client_socket)
         }
         else
         {
+            printf("Request body: %s\n", request_body);
             int status = write(file_fd, request_body, strlen(request_body));
             if (status == -1)
             {
