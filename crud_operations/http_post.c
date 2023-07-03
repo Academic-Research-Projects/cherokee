@@ -7,10 +7,8 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-#include "../include/http/http_response/http_response.h"
-#include "../include/http/http_request/http_request.h"
-#include "../include/http/http_formatter/http_formatter.h"
-#include "../include/http/http_parser/http_parser.h"
+#include "http/http_formatter/http_formatter.h"
+#include "http/http_parser/http_parser.h"
 #include "http/http_response/http_response.h"
 #include "http/http_request/http_request.h"
 #include "status_codes/http_status_codes.h"
@@ -23,15 +21,13 @@
 
 void *http_post(HttpRequest *request, int client_socket)
 {
-
-    // char *request_target = request->request_line.requestTarget;
     char *request_body = request->body;
 
-    // extract the file descriptor (socket descriptor) of the client connection from a void pointer.
-
-    // read client request
     // extract the requested file name from the client request
-    char filename[256] = {0}; // filename c'est un tableau
+    char *request_target = request->request_line.requestTarget;
+    char filename[256] = {0};
+    sscanf(request_target, "/%s", filename);
+
     // construct the complete file path
     char file_path[FILE_PATH_SIZE] = {0};
     snprintf(file_path, sizeof(file_path), "%s/%s", BASE_DIRECTORY, filename);
@@ -42,7 +38,7 @@ void *http_post(HttpRequest *request, int client_socket)
     char *response_str;
 
     // check if the requested file is an HTML, JSON, JPEG, or PNG file
-    char *file_extension = strrchr(filename, '.'); // strrchrr cherche la dernière occurrence définie dans le deuxième argument
+    char *file_extension = strrchr(filename, '.');
     if (file_extension)
     {
         if (strcmp(file_extension, ".html") == 0)
@@ -57,50 +53,35 @@ void *http_post(HttpRequest *request, int client_socket)
             content_type = "text/txt";
     }
 
-    printf("yo les gars %s", content_type);
-
     if (access(file_path, F_OK) != -1)
     {
-        char *not_found_response = "HTTP/1.1 409 Conflict\r\nContent-Type: text/plain\r\n\r\nThe file already exists\r\n";
-        write(client_socket, not_found_response, strlen(not_found_response));
+        response = createError409(response);
+        response_str = format_http_response(response);
+        write(client_socket, response_str, strlen(response_str));
     }
     else
     {
-
-        // Null-terminate the buffer to treat it as a string
         int file_fd = open(file_path, O_RDWR | O_CREAT | S_IRWXU, 0644);
-        printf("%d\n", file_fd);
-        puts("after open");
         if (file_fd == -1)
         {
-            puts("error");
             // file not found, send 404 response
-            perror("open failed");
             response = createError404(response);
             response_str = format_http_response(response);
             write(client_socket, response_str, strlen(response_str));
         }
         else
         {
-            if (!request_body)
-            {
-                puts("aja");
-            }
             int status = write(file_fd, request_body, strlen(request_body));
-            printf("%d\n", status);
             if (status == -1)
             {
                 perror("write failed");
                 return NULL;
             }
-            // send response headers
 
-            createSuccess200(response, "text/plain");
+            createSuccess200(response, content_type);
             response_str = format_http_response(response);
 
-            printf("Response: %s\n", response_str);
-
-            write(client_socket, response, strlen(response_str));
+            write(client_socket, response_str, strlen(response_str));
 
             free(response_str);
             free(response->headers);
@@ -108,8 +89,7 @@ void *http_post(HttpRequest *request, int client_socket)
             close(file_fd);
         }
     }
-    // close socket and free memory
+
     close(client_socket);
-    // free(socket_desc);
     return NULL;
 }

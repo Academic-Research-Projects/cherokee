@@ -41,9 +41,7 @@ void *http_get(HttpRequest *request, int client_socket)
         // File not found, send 404 response
         response = createError404(response);
         response_str = format_http_response(response);
-        printf("Response: %s\n", response_str);
         write(client_socket, response_str, strlen(response_str));
-        // write(client_socket, response->body, strlen(response->body));
     }
     else
     {
