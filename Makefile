@@ -12,9 +12,10 @@ http/http_response/http_response.c \
 http/http_handler/http_handler.c \
 status_codes/status_codes_success/success_200.c \
 crud_operations/http_head.c \
+crud_operations/http_delete.c \
 # crud_operations/http_post.c \
 # crud_operations/http_put.c \
-# crud_operations/http_delete.c \
+
 # http/http_request/http_request.c \
 # http/http_request/headers/headers.c \
 # http/http_request/request_line/request_line.c \

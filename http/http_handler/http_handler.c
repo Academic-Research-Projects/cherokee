@@ -2,6 +2,7 @@
 #include "http/http_request/http_request.h"
 #include "crud_operations/http_get.h"
 #include "crud_operations/http_post.h"
+#include "crud_operations/http_delete.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -23,11 +24,11 @@ void *handle_request(HttpRequest *request, int client_socket)
     //     // handle PUT request
     //     http_put(request, client_socket);
     // }
-    // else if (strcmp(request->request_line.method, "DELETE") == 0)
-    // {
-    //     // handle DELETE request
-    //     http_delete(request, client_socket);
-    // }
+    else if (strcmp(request->request_line.method, "DELETE") == 0)
+    {
+        // handle DELETE request
+        http_delete(request, client_socket);
+    }
     // else
     // {
     //     // handle invalid request
