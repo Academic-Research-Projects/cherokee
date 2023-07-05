@@ -7,17 +7,19 @@
 
 void *handle_request(HttpRequest *request, int client_socket)
 {
+    printf("Handle request\n");
     if (strcmp(request->request_line.method, "GET") == 0)
     {
         printf("Http Get");
         // handle GET request
         http_get(request, client_socket);
     }
-    // else if (strcmp(request->request_line.method, "POST") == 0)
-    // {
-    //     // handle POST request
-    //     http_post(request, client_socket);
-    // }
+    else if (strcmp(request->request_line.method, "POST") == 0)
+    {
+        printf("Http Post");
+        // handle POST request
+        http_post(request, client_socket);
+    }
     // else if (strcmp(request->request_line.method, "PUT") == 0)
     // {
     //     // handle PUT request
