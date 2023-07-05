@@ -1,6 +1,8 @@
-#include "status_codes/stauts_codes_success/success_204.h"
+#include "status_codes/http_status_codes.h"
 #include "http/http_response/http_response.h"
 #include <stddef.h>
+#include <string.h>
+#include <stdlib.h>
 
 char *noContentMessage(void)
 {

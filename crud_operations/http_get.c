@@ -1,12 +1,8 @@
-#include "../include/http/http_response/http_response.h"
-#include "../include/http/http_request/http_request.h"
-#include "../include/status_codes/status_codes_errors/http_client/error_404.h"
-#include "../include/http/http_formatter/http_formatter.h"
-#include "../include/http/http_parser/http_parser.h"
 #include "http/http_response/http_response.h"
 #include "http/http_request/http_request.h"
-#include "status_codes/status_codes_errors/http_client/error_400.h"
-#include "status_codes/stauts_codes_success/success_200.h"
+#include "http/http_formatter/http_formatter.h"
+#include "http/http_parser/http_parser.h"
+#include "status_codes/http_status_codes.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -45,9 +41,7 @@ void *http_get(HttpRequest *request, int client_socket)
         // File not found, send 404 response
         response = createError404(response);
         response_str = format_http_response(response);
-        printf("Response: %s\n", response_str);
         write(client_socket, response_str, strlen(response_str));
-        // write(client_socket, response->body, strlen(response->body));
     }
     else
     {

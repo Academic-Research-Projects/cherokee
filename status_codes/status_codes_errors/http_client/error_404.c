@@ -1,4 +1,4 @@
-#include "status_codes/status_codes_errors/http_client/error_404.h"
+#include "status_codes/http_status_codes.h"
 #include "http/http_response/http_response.h"
 #include <stddef.h>
 #include <string.h>
@@ -6,17 +6,17 @@
 
 char *notFoundMessage(void)
 {
-    return "Not Found";
+    return "Not Found\n";
 }
 
 HttpResponse *createError404(HttpResponse *response)
 {
     response->headers = malloc(sizeof(struct ResponseHeaders));
-    response->headers->name = strdup("Content-Type");
-    response->headers->value = strdup("text/plain");
-    response->httpVersion = strdup("HTTP/1.1");
+    response->headers->name = "Content-Type";
+    response->headers->value = "text/plain";
+    response->httpVersion = "HTTP/1.1";
     response->statusCode = 404;
     response->statusText = notFoundMessage();
-    response->body = strdup("404 not found\n");
+    response->body = strdup(notFoundMessage());
     return response;
 }
