@@ -1,12 +1,13 @@
 #include "../include/http/http_response/http_response.h"
 #include "../include/http/http_request/http_request.h"
-#include "../include/status_codes/status_codes_errors/http_client/error_404.h"
+// #include "../include/status_codes/status_codes_errors/http_client/error_404.h"
 #include "../include/http/http_formatter/http_formatter.h"
+#include "../include/status_codes/http_status_codes.h"
 #include "../include/http/http_parser/http_parser.h"
 #include "http/http_response/http_response.h"
 #include "http/http_request/http_request.h"
-#include "status_codes/status_codes_errors/http_client/error_400.h"
-#include "status_codes/stauts_codes_success/success_200.h"
+// #include "status_codes/status_codes_errors/http_client/error_400.h"
+// #include "status_codes/stauts_codes_success/success_200.h"
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,7 +23,7 @@
 // #define FILE_PATH_SIZE 512
 // #define RESPONSE_BUFFER_SIZE 4096
 // #define FILE_PATH_SIZE 512
-//#define BUFFER_SIZE 1024
+// #define BUFFER_SIZE 1024
 
 void *http_delete(HttpRequest *request, int client_socket)
 {
