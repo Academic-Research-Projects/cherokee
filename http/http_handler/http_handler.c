@@ -1,6 +1,7 @@
 // #include "http/http_response/http_response.h"
 #include "http/http_request/http_request.h"
 #include "crud_operations/http_get.h"
+#include "crud_operations/http_head.h"
 #include "crud_operations/http_post.h"
 #include "crud_operations/http_delete.h"
 #include <stdio.h>
@@ -28,6 +29,11 @@ void *handle_request(HttpRequest *request, int client_socket)
     {
         // handle DELETE request
         http_delete(request, client_socket);
+    }
+    else if (strcmp(request->request_line.method, "HEAD") == 0)
+    {
+        // handle DELETE request
+        http_head(request, client_socket);
     }
     // else
     // {

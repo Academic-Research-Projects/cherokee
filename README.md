@@ -49,6 +49,11 @@ Accept: */*`
 - Execute `curl -X DELETE http://localhost:8080/file-to-erase.txt`
 - You should see the text in your server terminal
 
+## How to test the HTTP HEAD request, deleting a .txt file
+- Open another terminal
+- Execute `curl -I -X HEAD http://localhost:8080/sendhelp.txt`
+- You should see the text in your server terminal
+
 ## WORK IN PROGRESS
 - Code compiles
 - J'ai essayé de faire marcher la fonction createError404(response), mais je me tape un segfault. file_fd donne autre valeur que -1 quand le fichier n'existe pas, je ne comprends pas pourquoi.

@@ -6,12 +6,14 @@
 #include <netinet/in.h>
 
 #include "master/thread_pool.h"
-#include "../crud_operations/http_head.h"
-// #include "../crud_operations/http_post.h"
-// #include "../crud_operations/http_put.h"
-// #include "../crud_operations/http_delete.h"
+// #include "../crud_operations/http_head.h"
+//  #include "../crud_operations/http_post.h"
+//  #include "../crud_operations/http_put.h"
+//  #include "../crud_operations/http_delete.h"
 #include "crud_operations/http_get.h"
 #include "crud_operations/http_post.h"
+#include "crud_operations/http_delete.h"
+#include "crud_operations/http_head.h"
 #include "http/http_request/http_request.h"
 #include "http/http_response/http_response.h"
 #include "http/http_parser/http_parser.h"
