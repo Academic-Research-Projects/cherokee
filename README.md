@@ -34,11 +34,6 @@ Host: localhost:8080
 User-Agent: curl/7.74.0
 Accept: */*`
 
-## How to test the HTTP POST request, posting a simple text
-- Open another terminal
-- Execute `curl -X POST -d "The text you want to post" http://localhost:8080`
-- You should see the text in your server terminal
-
 ## How to test the HTTP POST request, posting a .txt file
 - Open another terminal
 - Execute `curl -X POST -d "hello antho" http://localhost:8080/file.txt`
@@ -51,7 +46,7 @@ Accept: */*`
 
 ## How to test the HTTP DELETE request, deleting a .txt file
 - Open another terminal
-- Execute `curl -X PUT -d "this file has been modified" http://localhost:8080/file.txt`
+- Execute `curl -X DELETE http://localhost:8080/file-to-erase.txt`
 - You should see the text in your server terminal
 
 ## WORK IN PROGRESS
