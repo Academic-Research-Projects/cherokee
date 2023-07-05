@@ -11,7 +11,6 @@ login: blanch_b loizag_g utzman_f baudet_c
 - Criterion : https://github.com/Snaipe/Criterion#downloads 
     - Ubuntu (>=21.04) / Debian (>=11) : `sudo apt-get install libcriterion-dev`
     - Other : https://criterion.readthedocs.io/en/latest/setup.html#installation
-- Install apache bench : `sudo apt install apache2-utils`
 
 ## How to use
 - Compile the program : `make`
@@ -22,8 +21,7 @@ login: blanch_b loizag_g utzman_f baudet_c
 - Run the program with valgrind : `valgrind ./cherokee` => Debug mode (memory leaks)
 - Run the program with gdb : `gdb ./cherokee` => Debug mode
 - Run apache bench : `ab -n 1000 -c 100 http://localhost:8080/`
-<!-- - Run criterion tests : `make tests_run` -->
-<!-- - Run functional tests : ... -->
+- Run criterion tests : `make ftest`
 
 ## How to test
 - Open another terminal
@@ -64,3 +62,22 @@ Accept: */*`
 - Pour tester la fonction createSuccess200(response, content_type)  j'exécute depuis le client un simple "curl http://localhost:8080/zoubisou.json, ce fichier existe et se trouve dans le repertoire test_files
 - REMARQUE : à chaque fois qu'on veut tester une fonction, il faut décommenter les fichiers nécessaires sur le Makefile.
 - REMARQUE 1 : moi j'ai bougé entre multiplex.c + http_get.c + les fichiers avec les fonctions correspondantes à tester (*.h et *.c respectivement)
+
+## How to make Criterion unit tests
+- Create a file named `test_*.c` in the `test` folder or use an existing one for the same purpose
+- Write your tests in this file
+    - Include the criterion header : `#include <criterion/criterion.h>`
+    - Include the header of the file you want to test : `#include "../src/*.h"`
+    - Write a function named : `Test(TestName, TestDescription)`
+    - Write your tests in this function
+    - Use the criterion macros to test your functions :
+        - `cr_assert(condition)` : Assert that the condition is true
+        - documentation : https://criterion.readthedocs.io/en/latest/assert.html
+- Group tests by purpose/features in different files
+- You can use the template as an example : `test/test_template.c` or `test/test_server_socket.c`
+
+## Useful commands
+- List all running process : `ps -aux | less`
+- List process with open ports : `sudo netstat -tulpn`
+- Display process with specific port : `sudo lsof -i -P -n | grep <PORT>`
+- Kill a process : `sudo kill -9 <PID>`

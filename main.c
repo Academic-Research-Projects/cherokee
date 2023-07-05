@@ -1,25 +1,11 @@
-#include <pthread.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include "master/multiplex.h"
-#include "master/server_socket.h"
-#include "crud_operations/http_get.h"
-#include "../crud_operations/http_head.h"
-// #include "crud_operations/http_post.h"
+#include "include/master/server_socket.h"
 
 #define PORT 8080
 
 // main() function that starts the server
 int main()
 {
-    int server_socket = create_server_socket(PORT);
-
-    multiplex_connections(&server_socket);
+    fork_server(PORT);
 
     return 0;
 }

@@ -26,7 +26,7 @@
 void *http_post(HttpRequest *request, int client_socket)
 {
 
-    char *request_target = request->request_line.requestTarget;
+    // char *request_target = request->request_line.requestTarget;
     char *request_body = request->body;
 
     // extract the file descriptor (socket descriptor) of the client connection from a void pointer.
@@ -59,7 +59,7 @@ void *http_post(HttpRequest *request, int client_socket)
             content_type = "text/txt";
     }
 
-    puts("hello ge");
+    printf("yo les gars %s", content_type);
 
     if (access(file_path, F_OK) != -1)
     {
