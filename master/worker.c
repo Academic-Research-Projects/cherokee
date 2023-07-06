@@ -27,12 +27,17 @@ Task *task;
 // Signal handler for SIGINT
 void handle_sigint(int sig)
 {
-    printf("Received signal %d, shutting down Worker ...\n", sig);
+    printf("Received signal %d, shutting down worker %d...\n", sig, getpid());
 
     close(epoll_fd);
     free(events);
 
     // free thread pool
+    for (int i = 0; i < MAX_THREADS; i++)
+    {
+        pthread_join(threadPool.threads[i], NULL);
+    }
+
     free(threadPool.threads);
     free(threadPool.queue->queue);
     free(threadPool.queue);
@@ -58,8 +63,7 @@ void handleClientRequest(ThreadPool *threadPool, int clientSocket)
 int worker(int *arg)
 {
     // Create and initialize the thread pool
-
-    threadPoolInit(&threadPool, MAX_THREADS);
+    threadPool.threads = threadPoolInit(&threadPool, MAX_THREADS);
 
     struct sockaddr_in client_addr;
     int server_socket = *arg;

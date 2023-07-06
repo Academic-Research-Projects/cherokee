@@ -31,7 +31,7 @@ typedef struct
 
 void *thread_routine(void *arg);
 
-void threadPoolInit(ThreadPool *threadPool, int numThreads);
+pthread_t *threadPoolInit(ThreadPool *threadPool, int numThreads);
 
 void threadPoolEnqueue(ThreadPool *threadPool, Task *task);
 

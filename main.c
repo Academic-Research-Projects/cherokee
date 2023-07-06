@@ -1,6 +1,8 @@
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include "include/master/server_socket.h"
 
@@ -8,7 +10,7 @@
 
 void sigint_handler(int sig)
 {
-    printf("Received signal %d, shutting down...\n", sig);
+    printf("Received signal %d, shutting down main process %d...\n", sig, getpid());
     exit(0);
 }
 

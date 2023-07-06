@@ -64,7 +64,7 @@ void *thread_routine(void *arg)
     return NULL;
 }
 
-void threadPoolInit(ThreadPool *threadPool, int numThreads)
+pthread_t *threadPoolInit(ThreadPool *threadPool, int numThreads)
 {
     threadPool->threads = (pthread_t *)malloc(sizeof(pthread_t) * numThreads);
     threadPool->numThreads = numThreads;
@@ -84,6 +84,8 @@ void threadPoolInit(ThreadPool *threadPool, int numThreads)
     {
         pthread_create(&(threadPool->threads[i]), NULL, thread_routine, (void *)threadPool);
     }
+
+    return threadPool->threads;
 }
 
 void threadPoolEnqueue(ThreadPool *threadPool, Task *task)
