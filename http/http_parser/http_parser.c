@@ -8,6 +8,8 @@
 bool parse_http_request(int client_socket, HttpRequest *httpRequest)
 {
     char buffer[1024];
+    char *token;
+
     size_t bytes_received = recv(client_socket, buffer, sizeof(buffer) - 1, 0);
 
     printf(buffer);
@@ -20,7 +22,12 @@ bool parse_http_request(int client_socket, HttpRequest *httpRequest)
 
     buffer[bytes_received] = '\0';
 
-    char *token;
+    char *body = strstr(buffer, "\r\n\r\n");
+
+    if (body != NULL)
+        httpRequest->body = strdup(body + 4);
+    else
+        httpRequest->body = NULL;
 
     token = strtok(buffer, " ");
     if (token == NULL)

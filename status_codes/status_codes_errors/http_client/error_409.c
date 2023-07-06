@@ -6,7 +6,7 @@
 
 char *conflictMessage(void)
 {
-    return "Conflict";
+    return "Conflict\n";
 }
 
 HttpResponse *createError409(HttpResponse *response)
