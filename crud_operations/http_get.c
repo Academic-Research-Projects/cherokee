@@ -23,7 +23,7 @@ void *http_get(HttpRequest *request, int client_socket)
     snprintf(file_path, sizeof(file_path), "%s/%s", BASE_DIRECTORY, request_target);
 
     // Print request
-    printf("Request: %s\n", request_target);
+    // printf("Request: %s\n", request_target);
 
     // Default content type
     char *content_type = "text/plain";
@@ -33,8 +33,8 @@ void *http_get(HttpRequest *request, int client_socket)
 
     // Open the requested file
     int file_fd = open(file_path, O_RDONLY);
-    printf("File descriptor: %d\n", file_fd);
-    printf("File path: %s\n", file_path);
+    // printf("File descriptor: %d\n", file_fd);
+    // printf("File path: %s\n", file_path);
 
     if (file_fd == -1)
     {
@@ -63,7 +63,7 @@ void *http_get(HttpRequest *request, int client_socket)
         createSuccess200(response, content_type);
         response_str = format_http_response(response);
 
-        printf("Response: %s\n", response_str);
+        // printf("Response: %s\n", response_str);
 
         write(client_socket, response_str, strlen(response_str));
 
@@ -75,7 +75,7 @@ void *http_get(HttpRequest *request, int client_socket)
         char file_buffer[1024];
         ssize_t bytes_read;
 
-        printf("Writing request to client socket");
+        // printf("Writing request to client socket");
 
         while ((bytes_read = read(file_fd, file_buffer, sizeof(file_buffer))) > 0)
         {
