@@ -30,6 +30,7 @@ By successfully completing the Cherokee project, you will gain a deeper understa
 - Criterion : https://github.com/Snaipe/Criterion#downloads 
     - Ubuntu (>=21.04) / Debian (>=11) : `sudo apt-get install libcriterion-dev`
     - Other : https://criterion.readthedocs.io/en/latest/setup.html#installation
+- Siege : `sudo apt-get install siege`
 
 ## How to use
 - Compile the program : `make`
@@ -41,6 +42,9 @@ By successfully completing the Cherokee project, you will gain a deeper understa
 - Run the program with gdb : `gdb ./cherokee` => Debug mode
 - Run apache bench : `ab -n 1000 -c 100 http://localhost:8080/`
 - Run criterion tests : `make ftest`
+- Run siege :
+    - over time : `siege -c 100 -t10s '127.0.0.1:8080/index.html'`
+    - over number of requests : `siege -c 100 -r100 '127.0.0.1:8080/index.html'`
 
 ## How to test
 - Open another terminal

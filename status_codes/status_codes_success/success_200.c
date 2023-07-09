@@ -6,7 +6,7 @@
 
 char *successMessage(void)
 {
-    return "OK";
+    return "OK\n";
 }
 
 HttpResponse *createSuccess200(HttpResponse *response, char *content_type)

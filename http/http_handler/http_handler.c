@@ -20,6 +20,7 @@
 
 void *handle_request(HttpRequest *request, int client_socket)
 {
+    printf("Handle request\n");
     if (strcmp(request->request_line.method, "GET") == 0)
     {
         printf("Http Get");

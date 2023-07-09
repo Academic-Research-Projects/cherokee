@@ -153,10 +153,10 @@ void fork_server(int port)
             exit(0);
         }
     }
-
     // Wait for the child processes to exit
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < num_workers; i++)
     {
         wait(NULL);
     }
+    free(worker_sockets);
 }

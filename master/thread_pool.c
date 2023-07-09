@@ -74,6 +74,7 @@ void *thread_routine(void *arg)
         handle_request(http_request, task->clientSocket);
 
         free(http_request);
+        free(task);
     }
 
     return NULL;

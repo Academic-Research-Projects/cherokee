@@ -6,7 +6,7 @@
 
 char *noContentMessage(void)
 {
-    return "No Content";
+    return "No Content\n";
 }
 
 HttpResponse *createSuccess204(HttpResponse *response)

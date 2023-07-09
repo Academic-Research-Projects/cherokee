@@ -13,6 +13,8 @@
 #include <signal.h>
 #include <arpa/inet.h>
 #include <stdbool.h>
+#include <string.h>
+#include <pthread.h>
 
 #include "master/worker.h"
 #include "master/thread_pool.h"
@@ -24,6 +26,8 @@
 int epoll_fd;
 struct epoll_event *events;
 bool loop = true;
+ThreadPool threadPool;
+Task *task;
 
 // Signal handler for SIGINT
 /**
@@ -36,10 +40,16 @@ bool loop = true;
  */
 void handle_sigint(int sig)
 {
-    printf("Received signal %d, shutting down...\n", sig);
+    printf("Received signal %d, shutting down Worker ...\n", sig);
 
     close(epoll_fd);
     free(events);
+
+    // free thread pool
+    free(threadPool.threads);
+    free(threadPool.queue->queue);
+    free(threadPool.queue);
+    free(task);
 
     loop = false;
 }
@@ -60,7 +70,7 @@ void handleClientRequest(ThreadPool *threadPool, int clientSocket)
     // ...
 
     // Create a task
-    Task *task = (Task *)malloc(sizeof(Task));
+    task = (Task *)malloc(sizeof(Task));
     task->clientSocket = clientSocket;
     // TODO Set the task arguments
 
@@ -80,7 +90,7 @@ void handleClientRequest(ThreadPool *threadPool, int clientSocket)
 int worker(int *arg)
 {
     // Create and initialize the thread pool
-    ThreadPool threadPool;
+
     threadPoolInit(&threadPool, MAX_THREADS);
 
     struct sockaddr_in client_addr;
@@ -96,6 +106,7 @@ int worker(int *arg)
 
     // Add server socket to epoll instance
     struct epoll_event event;
+    memset(&event, 0, sizeof(event));
     event.data.fd = server_socket;
     event.events = EPOLLIN;
     if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, server_socket, &event) == -1)
