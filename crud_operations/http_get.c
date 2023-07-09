@@ -1,3 +1,15 @@
+/**
+ * The function `http_get` handles a GET request by opening the requested file, determining its content
+ * type, creating an appropriate HTTP response, and sending the file contents to the client.
+ *
+ * @param request The "request" parameter is a pointer to an instance of the HttpRequest struct. This
+ * struct contains information about the HTTP request, such as the request line, headers, and request
+ * target.
+ * @param client_socket The `client_socket` parameter is the file descriptor of the socket connection
+ * between the server and the client. It is used to send the HTTP response back to the client.
+ *
+ * @return In this code snippet, the function `http_get` returns `NULL`.
+ */
 #include "http/http_response/http_response.h"
 #include "http/http_request/http_request.h"
 #include "http/http_formatter/http_formatter.h"
@@ -84,11 +96,6 @@ void *http_get(HttpRequest *request, int client_socket)
 
         close(file_fd);
     }
-
-    // close socket and free memory
-    // close(client_socket);
-    // free(socket_desc);
-
     close(client_socket);
     return NULL;
 }

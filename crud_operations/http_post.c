@@ -1,3 +1,15 @@
+/**
+ * The function `http_post` handles a POST request by extracting the requested file name, constructing
+ * the file path, checking the file extension, creating the appropriate response, and writing the
+ * response to the client socket.
+ * 
+ * @param request A pointer to an HttpRequest struct, which contains information about the client's
+ * HTTP request.
+ * @param client_socket The `client_socket` parameter is the file descriptor for the socket connection
+ * between the server and the client. It is used to send and receive data over the network.
+ * 
+ * @return a NULL pointer.
+ */
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>

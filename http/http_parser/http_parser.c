@@ -1,3 +1,15 @@
+/**
+ * The function `parse_http_request` reads and parses an HTTP request from a client socket.
+ * 
+ * @param client_socket The `client_socket` parameter is the file descriptor of the socket that is
+ * connected to the client. It is used to receive data from the client.
+ * @param httpRequest The `httpRequest` parameter is a pointer to a struct of type `HttpRequest`. This
+ * struct contains information about the HTTP request, such as the method, request target, and HTTP
+ * version.
+ * 
+ * @return The function `parse_http_request` returns a boolean value. It returns `true` if the HTTP
+ * request is successfully parsed and stored in the `HttpRequest` structure, and `false` otherwise.
+ */
 #include <stdbool.h>
 #include <stddef.h>
 #include "http/http_request/http_request.h"

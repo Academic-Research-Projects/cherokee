@@ -1,3 +1,15 @@
+/**
+ * The function `http_put` handles a PUT request by writing the request body to a file and sending a
+ * corresponding HTTP response.
+ * 
+ * @param request The `request` parameter is a pointer to an `HttpRequest` struct, which contains
+ * information about the HTTP request received from the client. It includes the request line, headers,
+ * and body of the request.
+ * @param client_socket The `client_socket` parameter is the file descriptor for the socket connection
+ * between the server and the client. It is used to send and receive data over the network.
+ * 
+ * @return The function `http_put` returns `NULL`.
+ */
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>

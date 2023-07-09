@@ -1,3 +1,7 @@
+/**
+ * The above code defines a thread pool implementation in C for handling client requests in a server
+ * application.
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
@@ -22,6 +26,16 @@
 #define MAX_THREADS 10
 #define MAX_QUEUE_SIZE 100
 
+/**
+ * The function `thread_routine` is a worker thread function that retrieves tasks from a queue,
+ * processes them, and handles client requests.
+ * 
+ * @param arg The `arg` parameter is a void pointer that is passed to the thread routine function. In
+ * this case, it is expected to be a pointer to a `ThreadPool` object. The `ThreadPool` object contains
+ * information about the thread pool, including a pointer to the task queue that the threads will be.
+ * 
+ * @return a `void` pointer, which is `NULL`.
+ */
 void *thread_routine(void *arg)
 {
     ThreadPool *threadPool = (ThreadPool *)arg;
@@ -65,6 +79,15 @@ void *thread_routine(void *arg)
     return NULL;
 }
 
+/**
+ * The function initializes a thread pool with a specified number of threads and sets up the necessary
+ * data structures for task management.
+ * 
+ * @param threadPool A pointer to a ThreadPool struct, which contains information about the thread
+ * pool.
+ * @param numThreads The `numThreads` parameter specifies the number of threads that will be created in
+ * the thread pool.
+ */
 void threadPoolInit(ThreadPool *threadPool, int numThreads)
 {
     threadPool->threads = (pthread_t *)malloc(sizeof(pthread_t) * numThreads);
@@ -87,6 +110,14 @@ void threadPoolInit(ThreadPool *threadPool, int numThreads)
     }
 }
 
+/**
+ * The function `threadPoolEnqueue` adds a task to the thread pool's task queue, waiting if the queue
+ * is full.
+ * 
+ * @param threadPool A pointer to the ThreadPool structure, which contains information about the thread
+ * pool and its associated queue.
+ * @param task A pointer to a Task object that represents the task to be enqueued in the thread pool.
+ */
 void threadPoolEnqueue(ThreadPool *threadPool, Task *task)
 {
     pthread_mutex_lock(&(threadPool->queue->mutex));

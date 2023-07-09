@@ -1,3 +1,8 @@
+/**
+ * The above code is a C program that implements a master-worker architecture using epoll and a thread
+ * pool to handle client requests.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -21,6 +26,14 @@ struct epoll_event *events;
 bool loop = true;
 
 // Signal handler for SIGINT
+/**
+ * The function "handle_sigint" is used to handle the SIGINT signal, which is typically sent when the
+ * user presses Ctrl+C, and it shuts down the program by closing the epoll file descriptor and freeing
+ * the events array.
+ * 
+ * @param sig The parameter "sig" is the signal number that is received. In this case, it is used to
+ * print the signal number in the printf statement.
+ */
 void handle_sigint(int sig)
 {
     printf("Received signal %d, shutting down...\n", sig);
@@ -31,6 +44,16 @@ void handle_sigint(int sig)
     loop = false;
 }
 
+/**
+ * The function handleClientRequest creates a task and enqueues it to a thread pool for processing.
+ * 
+ * @param threadPool A pointer to a ThreadPool object. This object represents a pool of threads that
+ * can be used to execute tasks concurrently. The ThreadPool object should have functions to enqueue
+ * tasks and manage the execution of those tasks by the threads in the pool.
+ * @param clientSocket The clientSocket parameter is an integer that represents the socket file
+ * descriptor for the client connection. It is used to communicate with the client and send/receive
+ * data.
+ */
 void handleClientRequest(ThreadPool *threadPool, int clientSocket)
 {
     // TODO Process the client request
@@ -45,6 +68,15 @@ void handleClientRequest(ThreadPool *threadPool, int clientSocket)
     threadPoolEnqueue(threadPool, task);
 }
 
+/**
+ * The function `worker` creates a thread pool, initializes an epoll instance, and handles client
+ * connections using epoll events.
+ * 
+ * @param arg The parameter `arg` is a pointer to an integer. It is used to pass the server socket file
+ * descriptor to the `worker` function.
+ * 
+ * @return an integer value of 0.
+ */
 int worker(int *arg)
 {
     // Create and initialize the thread pool
