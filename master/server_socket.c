@@ -20,14 +20,14 @@ int create_socket()
     if (socket_fd < 0)
     {
         perror("Error creating socket");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     int optval = 1;
     if (setsockopt(socket_fd, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(optval)) < 0)
     {
         perror("Error setting SO_REUSEPORT option");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     return socket_fd;
@@ -44,7 +44,7 @@ void bind_socket(int socket_fd, int port)
     if (bind(socket_fd, (struct sockaddr *)&server_address, sizeof(server_address)) < 0)
     {
         perror("Error binding socket");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 }
 
@@ -54,7 +54,7 @@ void listen_on_socket(int socket_fd)
     if (listen(socket_fd, 10) < 0)
     {
         perror("Error listening");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 }
 
@@ -91,7 +91,7 @@ void fork_server(int port)
         if (childPid < 0)
         {
             perror("Error forking the process");
-            exit(1);
+            exit(EXIT_FAILURE);
         }
 
         if (childPid == 0)
@@ -103,8 +103,9 @@ void fork_server(int port)
             // Close each worker socket
             close(worker_sockets[i]);
 
+            printf("Child process %d exiting...\n", getpid());
             // Exit the child process
-            exit(0);
+            exit(EXIT_SUCCESS);
         }
     }
     // Wait for the child processes to exit

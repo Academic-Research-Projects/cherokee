@@ -21,6 +21,8 @@
 int epoll_fd;
 struct epoll_event *events;
 bool loop = true;
+// Flag to indicate whether the loop should be terminated
+volatile sig_atomic_t terminate_loop = 0;
 ThreadPool threadPool;
 Task *task;
 
@@ -31,19 +33,24 @@ void handle_sigint(int sig)
 
     close(epoll_fd);
     free(events);
+    // close(task->clientSocket);
 
+    printf("before free thread pool\n");
     // free thread pool
     for (int i = 0; i < MAX_THREADS; i++)
     {
-        pthread_join(threadPool.threads[i], NULL);
+        printf("pthread_join %d\n", pthread_join(threadPool.threads[i], NULL));
     }
+    printf("after free thread pool\n");
 
     free(threadPool.threads);
     free(threadPool.queue->queue);
     free(threadPool.queue);
     free(task);
 
+    printf("loop = false\n");
     loop = false;
+    terminate_loop = 1;
 }
 
 void handleClientRequest(ThreadPool *threadPool, int clientSocket)
@@ -95,7 +102,7 @@ int worker(int *arg)
         exit(EXIT_FAILURE);
     }
 
-    while (loop)
+    while (!terminate_loop)
     {
         // Add signal handler for SIGINT
         signal(SIGINT, handle_sigint);
@@ -137,7 +144,6 @@ int worker(int *arg)
                 // Reinitialize event structure
                 event.data.fd = -1;
                 event.events = 0;
-                // }
             }
         }
     }
