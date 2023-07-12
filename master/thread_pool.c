@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <stdbool.h>
 
 #include "master/thread_pool.h"
 #include "../crud_operations/http_head.h"
@@ -17,7 +18,7 @@
 #include "http/http_parser/http_parser.h"
 #include "http/http_handler/http_handler.h"
 
-#define MAX_THREADS 10
+#define MAX_THREADS 1
 #define MAX_QUEUE_SIZE 100
 
 void *thread_routine(void *arg)
@@ -29,9 +30,15 @@ void *thread_routine(void *arg)
         pthread_mutex_lock(&(threadPool->queue->mutex));
 
         // Wait for a task to be available
-        while (threadPool->queue->size == 0)
+        while (threadPool->queue->size == 0 && threadPool->terminate_flag == false)
         {
             pthread_cond_wait(&(threadPool->queue->notEmpty), &(threadPool->queue->mutex));
+        }
+        printf("Thread %ld woke up\n", pthread_self());
+
+        if (threadPool->terminate_flag == true)
+        {
+            break;
         }
 
         // Retrieve a task from the queue
@@ -61,6 +68,10 @@ void *thread_routine(void *arg)
         free(task);
     }
 
+    printf("Thread %ld exiting...\n", pthread_self());
+    pthread_exit(NULL);
+    // free thread pool
+
     return NULL;
 }
 
@@ -68,6 +79,7 @@ pthread_t *threadPoolInit(ThreadPool *threadPool, int numThreads)
 {
     threadPool->threads = (pthread_t *)malloc(sizeof(pthread_t) * numThreads);
     threadPool->numThreads = numThreads;
+    threadPool->terminate_flag = false;
 
     threadPool->queue = (ThreadPoolQueue *)malloc(sizeof(ThreadPoolQueue));
     threadPool->queue->queue = (Task **)malloc(sizeof(Task *) * MAX_QUEUE_SIZE);

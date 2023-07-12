@@ -1,6 +1,8 @@
 #ifndef THREAD_POOL_H
 #define THREAD_POOL_H
 
+#include <stdbool.h>
+
 typedef struct
 {
     int clientSocket;
@@ -25,6 +27,7 @@ typedef struct
     pthread_t *threads;
     int numThreads;
     ThreadPoolQueue *queue;
+    bool terminate_flag;
     // Add any additional data you need for the thread pool
     // ...
 } ThreadPool;

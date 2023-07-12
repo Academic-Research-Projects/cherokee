@@ -14,7 +14,7 @@
 #include "master/worker.h"
 #include "master/thread_pool.h"
 
-#define MAX_THREADS 10
+#define MAX_THREADS 1
 #define MAX_QUEUE_SIZE 10
 #define MAX_EVENTS 1000
 
@@ -35,13 +35,20 @@ void handle_sigint(int sig)
     free(events);
     // close(task->clientSocket);
 
-    printf("before free thread pool\n");
+    // printf("before free thread pool\n");
     // free thread pool
-    for (int i = 0; i < MAX_THREADS; i++)
-    {
-        printf("pthread_join %d\n", pthread_join(threadPool.threads[i], NULL));
-    }
-    printf("after free thread pool\n");
+    // for (int i = 0; i < MAX_THREADS; i++)
+    // {
+    //     printf("pthread_join %d\n", pthread_join(threadPool.threads[i], NULL));
+    // }
+    // printf("after free thread pool\n");
+
+    // Signal the threads to terminate
+    // pthread_mutex_lock(&(threadPool.queue->mutex));
+
+    threadPool.terminate_flag = true;
+    pthread_cond_broadcast(&(threadPool.queue->notEmpty));
+    // pthread_mutex_unlock(&(threadPool.queue->mutex));
 
     free(threadPool.threads);
     free(threadPool.queue->queue);

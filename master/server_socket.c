@@ -75,7 +75,7 @@ int *create_server_sockets(int port, int num_workers)
 
 void fork_server(int port)
 {
-    int num_workers = 3; // Number of worker processes
+    int num_workers = 1; // Number of worker processes
 
     int *worker_sockets = create_server_sockets(port, num_workers);
 
