@@ -69,7 +69,6 @@ int *create_server_sockets(int port, int num_workers)
         bind_socket(worker_sockets[i], port);
         listen_on_socket(worker_sockets[i]);
     }
-
     return worker_sockets;
 }
 
@@ -100,12 +99,11 @@ void fork_server(int port)
             printf("Child process %d\n", getpid());
             worker(&worker_sockets[i]);
 
-            // Close each worker socket
+            printf("Child process %d exiting...\n", getpid());
             close(worker_sockets[i]);
 
-            printf("Child process %d exiting...\n", getpid());
             // Exit the child process
-            exit(EXIT_SUCCESS);
+            // exit(EXIT_SUCCESS);
         }
     }
     // Wait for the child processes to exit
@@ -114,4 +112,7 @@ void fork_server(int port)
         wait(NULL);
     }
     free(worker_sockets);
+    return;
 }
+
+

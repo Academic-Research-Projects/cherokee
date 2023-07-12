@@ -18,7 +18,7 @@
 #include "http/http_parser/http_parser.h"
 #include "http/http_handler/http_handler.h"
 
-#define MAX_THREADS 1
+#define MAX_THREADS 10
 #define MAX_QUEUE_SIZE 100
 
 void *thread_routine(void *arg)
@@ -30,13 +30,13 @@ void *thread_routine(void *arg)
         pthread_mutex_lock(&(threadPool->queue->mutex));
 
         // Wait for a task to be available
-        while (threadPool->queue->size == 0 && threadPool->terminate_flag == false)
+        while (threadPool->queue->size == 0 && threadPool->terminate_flag == 0)
         {
             pthread_cond_wait(&(threadPool->queue->notEmpty), &(threadPool->queue->mutex));
+            printf("Thread %ld woke up, terminate flag is %d\n", pthread_self(), threadPool->terminate_flag);
         }
-        printf("Thread %ld woke up\n", pthread_self());
 
-        if (threadPool->terminate_flag == true)
+        if (threadPool->terminate_flag == 1)
         {
             break;
         }
@@ -80,6 +80,7 @@ pthread_t *threadPoolInit(ThreadPool *threadPool, int numThreads)
     threadPool->threads = (pthread_t *)malloc(sizeof(pthread_t) * numThreads);
     threadPool->numThreads = numThreads;
     threadPool->terminate_flag = false;
+    printf("Thread pool terminated flag : %d\n", threadPool->terminate_flag);
 
     threadPool->queue = (ThreadPoolQueue *)malloc(sizeof(ThreadPoolQueue));
     threadPool->queue->queue = (Task **)malloc(sizeof(Task *) * MAX_QUEUE_SIZE);

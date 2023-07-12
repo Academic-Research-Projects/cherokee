@@ -10,6 +10,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <pthread.h>
+#include <stdbool.h>
 
 #include "master/worker.h"
 #include "master/thread_pool.h"
@@ -33,22 +34,16 @@ void handle_sigint(int sig)
 
     close(epoll_fd);
     free(events);
-    // close(task->clientSocket);
-
-    // printf("before free thread pool\n");
-    // free thread pool
-    // for (int i = 0; i < MAX_THREADS; i++)
-    // {
-    //     printf("pthread_join %d\n", pthread_join(threadPool.threads[i], NULL));
-    // }
-    // printf("after free thread pool\n");
-
-    // Signal the threads to terminate
-    // pthread_mutex_lock(&(threadPool.queue->mutex));
 
     threadPool.terminate_flag = true;
+    // Notify all threads that the terminate flag is 1
     pthread_cond_broadcast(&(threadPool.queue->notEmpty));
-    // pthread_mutex_unlock(&(threadPool.queue->mutex));
+
+    // Join threads
+    for (int i = 0; i < threadPool.numThreads; i++)
+    {
+        pthread_join(threadPool.threads[i], NULL);
+    }
 
     free(threadPool.threads);
     free(threadPool.queue->queue);
@@ -59,6 +54,7 @@ void handle_sigint(int sig)
     loop = false;
     terminate_loop = 1;
 }
+
 
 void handleClientRequest(ThreadPool *threadPool, int clientSocket)
 {
@@ -154,5 +150,6 @@ int worker(int *arg)
             }
         }
     }
+    
     return 0;
 }

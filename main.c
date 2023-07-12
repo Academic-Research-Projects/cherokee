@@ -8,17 +8,19 @@
 
 #define PORT 8080
 
-void sigint_handler(int sig)
-{
-    printf("Received signal %d, shutting down main process %d...\n", sig, getpid());
-    exit(0);
-}
+// void sigint_handler(int sig)
+// {
+//     printf("Received signal %d, shutting down main process %d...\n", sig, getpid());
+//     exit(0);
+// }
 
 // main() function that starts the server
 int main()
 {
-    signal(SIGINT, sigint_handler);
+    // signal(SIGINT, sigint_handler);
+    
     fork_server(PORT);
 
+    printf("Main process %d exiting...\n", getpid());
     return 0;
 }
