@@ -8,8 +8,9 @@ SRCS=main.c \
 $(wildcard master/*.c) \
 $(wildcard crud_operations/*.c) \
 $(wildcard http/*/*.c) \
-status_codes/status_codes_success/success_200.c \
-status_codes/status_codes_errors/http_client/error_404.c
+$(wildcard status_codes/status_codes_success/*.c) \
+$(wildcard status_codes/status_codes_errors/*/*.c) \
+status_codes/http_status_codes.c
 
 OBJS=$(SRCS:.c=.o)
 TEST_SRCS = $(wildcard test/*.c) $(wildcard master/*.c) $(wildcard crud_operations/*.c)

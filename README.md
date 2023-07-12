@@ -1,6 +1,25 @@
 # Groupe de blanch_b 1003936
 login: blanch_b loizag_g utzman_f baudet_c
 
+# Cherokee - HTTP Server Implementation in C
+
+## Overview:
+The Cherokee project aims to implement a simplified version of the HTTP protocol in C, creating a server capable of serving files and handling client requests. The project focuses on networking, understanding sockets and the TCP protocol, as well as designing architectures that meet performance requirements.
+
+## Key Objectives:
+
+- Communicating with Clients: The server communicates with clients using TCP sockets and handles requests asynchronously to serve multiple clients simultaneously.
+- Implementing the HTTP Protocol: The server partially implements the HTTP 1.1 protocol, including parsing headers, supporting methods like GET, HEAD, POST, PUT, and DELETE, and generating appropriate responses.
+- Serving Static Files: The server can serve various file types, such as text files, HTML files, JSON files, and different image formats, with the correct content type.
+- Generating Customizable Responses: In addition to serving static files, the server can associate specific URLs or patterns with predefined logic (e.g., CRUD operations), allowing for customizable responses.
+- Architecturing the Project: It is essential to design the project's architecture before implementation, considering aspects like data reception from clients, handling disconnections, managing invalid or incomplete requests, and handling multiple requests simultaneously.
+- Performance Considerations: Performance is a crucial aspect of the project, requiring the identification of critical performance factors such as CPU performance, memory management, and I/O operations. Optimizing these aspects is necessary to ensure efficient server performance.
+- Testing the Project: Thorough testing is essential, including unit tests to validate individual code portions and functional tests to verify overall project behavior.
+- Demonstration: During the project presentation, justifications for architectural choices and algorithms will be provided, along with demonstrations using benchmarks to showcase performance improvements.
+- External Libraries: While the project primarily relies on the C standard library and POSIX threads, the use of additional libraries is allowed if they do not implement project logic and can be justified in terms of relevance and integration into the architecture.
+
+By successfully completing the Cherokee project, you will gain a deeper understanding of networking concepts, socket communication, the HTTP protocol, and designing performant server architectures in C.
+
 ## Requirements
 - Linux (Tested on Debian 11)
 - GCC compiler : `sudo apt-get install build-essential`
@@ -38,11 +57,6 @@ Host: localhost:8080
 User-Agent: curl/7.74.0
 Accept: */*`
 
-## How to test the HTTP POST request, posting a simple text
-- Open another terminal
-- Execute `curl -X POST -d "The text you want to post" http://localhost:8080`
-- You should see the text in your server terminal
-
 ## How to test the HTTP POST request, posting a .txt file
 - Open another terminal
 - Execute `curl -X POST -d "hello antho" http://localhost:8080/file.txt`
@@ -55,17 +69,13 @@ Accept: */*`
 
 ## How to test the HTTP DELETE request, deleting a .txt file
 - Open another terminal
-- Execute `curl -X PUT -d "this file has been modified" http://localhost:8080/file.txt`
+- Execute `curl -X DELETE http://localhost:8080/file-to-erase.txt`
 - You should see the text in your server terminal
 
-## WORK IN PROGRESS
-- Code compiles
-- J'ai essayé de faire marcher la fonction createError404(response), mais je me tape un segfault. file_fd donne autre valeur que -1 quand le fichier n'existe pas, je ne comprends pas pourquoi.
-- Comme cela ne marchait pas, j'ai essayé de faire marcher la fonction createSuccess200(response, content_type). Toujours de segfault, le code ne rentre pas dans la condition if.
-- Pour tester la fonction createError404(response), j'exécute depuis le client un simple "curl http://localhost:8080/hola.html (ce fichier n'existe pas donc la valeur de fd devrait être -1, or ça donne toujours un valeur positif)".
-- Pour tester la fonction createSuccess200(response, content_type)  j'exécute depuis le client un simple "curl http://localhost:8080/zoubisou.json, ce fichier existe et se trouve dans le repertoire test_files
-- REMARQUE : à chaque fois qu'on veut tester une fonction, il faut décommenter les fichiers nécessaires sur le Makefile.
-- REMARQUE 1 : moi j'ai bougé entre multiplex.c + http_get.c + les fichiers avec les fonctions correspondantes à tester (*.h et *.c respectivement)
+## How to test the HTTP HEAD request, deleting a .txt file
+- Open another terminal
+- Execute `curl -I -X HEAD http://localhost:8080/sendhelp.txt`
+- You should see the text in your server terminal
 
 ## How to make Criterion unit tests
 - Create a file named `test_*.c` in the `test` folder or use an existing one for the same purpose

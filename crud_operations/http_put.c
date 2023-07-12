@@ -1,3 +1,15 @@
+/**
+ * The function `http_put` handles a PUT request by writing the request body to a file and sending a
+ * corresponding HTTP response.
+ * 
+ * @param request The `request` parameter is a pointer to an `HttpRequest` struct, which contains
+ * information about the HTTP request received from the client. It includes the request line, headers,
+ * and body of the request.
+ * @param client_socket The `client_socket` parameter is the file descriptor for the socket connection
+ * between the server and the client. It is used to send and receive data over the network.
+ * 
+ * @return The function `http_put` returns `NULL`.
+ */
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,6 +19,11 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+#include "http/http_response/http_response.h"
+#include "http/http_request/http_request.h"
+#include "http/http_formatter/http_formatter.h"
+#include "http/http_parser/http_parser.h"
+#include "status_codes/http_status_codes.h"
 
 #define PORT 8080
 #define BASE_DIRECTORY "test_files"
@@ -15,37 +32,22 @@
 #define FILE_PATH_SIZE 512
 #define BUFFER_SIZE 1024
 
-void *http_put(void *socket_desc)
+void *http_put(HttpRequest *request, int client_socket)
 {
+    // Extract the request target from the request line
+    char *request_target = request->request_line.requestTarget;
+    char *request_body = request->body;
 
-    // extract the file descriptor (socket descriptor) of the client connection from a void pointer.
-    int client_socket = *(int *)socket_desc; // file descriptor
-    printf("%d\n", client_socket);
-
-    // read client request
-    char buffer[1024] = {0};                            // string array
-    ssize_t client_request;                             // signed integer
-    client_request = read(client_socket, buffer, 1024); // nombre de bytes dans le buffer du file descriptor
-    printf("%ld\n", client_request);
-    if (client_request < 0)
-    {
-        perror("read error");
-    }
-    printf("%s\n", buffer);
-
-    // extract the requested file name from the client request
-    char filename[256] = {0};            // filename c'est un tableau
-    sscanf(buffer, "PUT /%s", filename); // sscanf() parse data from a string and store the extracted value into variables
-
-    // construct the complete file path
+    // Construct the complete file path
     char file_path[FILE_PATH_SIZE] = {0};
-    snprintf(file_path, sizeof(file_path), "%s/%s", BASE_DIRECTORY, filename); // snpritnf is used to write formatted data to a character array (string) with a specified maximum lentgh
+    snprintf(file_path, sizeof(file_path), "%s/%s", BASE_DIRECTORY, request_target);
 
-    // default content type
-    char *content_type = "text/plain"; // The MIME type "text/plain" is commonly used for files or data that contain plain text without any specific formatting or markup.
+    struct HttpResponse *response = malloc(sizeof(struct HttpResponse));
+    char *response_str;
 
-    // check if the requested file is an HTML, JSON, JPEG, or PNG file
-    char *file_extension = strrchr(filename, '.'); // strrchrr cherche la dernière occurrence définie dans le deuxième argument
+    // Determine the content type based on the file extension
+    char *content_type = "text/plain"; // default to plain text
+    char *file_extension = strrchr(request_target, '.');
     if (file_extension)
     {
         if (strcmp(file_extension, ".html") == 0)
@@ -60,44 +62,42 @@ void *http_put(void *socket_desc)
             content_type = "text/txt";
     }
 
-    // read the request body and modify it
-    if (client_request > 0)
+    // Open the file in write-only mode, creating it if it doesn't exist
+    int file_fd = open(file_path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (file_fd == -1)
     {
-        // Null-terminate the buffer to treat it as a string
-        buffer[client_request] = '\0';
-
-        char *request_body = strstr(buffer, "\r\n\r\n") + 4;
-        int file_fd = open(file_path, O_WRONLY | O_CREAT | O_TRUNC, 0644); // | S_IRUSR | S_IWUSR); // 0_(...) are flags that represent opening mode and options for the file
-        printf("%d\n", file_fd);
-        puts("after open");
-        if (file_fd == -1) // error : FD cannot open
-        {
-            puts("error");
-            // file not found, send 404 response
-            perror("open failed");
-            char *not_found_response = "HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\n\r\nFile not found, the path doesn't exist\r\n";
-            write(client_socket, not_found_response, strlen(not_found_response));
-        }
-        else
-        {
-            if (!request_body)
-            {
-                puts("there isn't a request body");
-            }
-            int status = write(file_fd, request_body, strlen(request_body));
-            printf("%d\n", status);
-            if (status == -1)
-            {
-                perror("write failed");
-                return NULL;
-            }
-            // send response headers
-            char response[RESPONSE_BUFFER_SIZE];
-            snprintf(response, RESPONSE_BUFFER_SIZE, "HTTP/1.1 200 OK\r\nContent-Type: %s\r\n\r\n%s", content_type, "Your request have been modified\n");
-            write(client_socket, response, strlen(response));
-            close(file_fd);
-        }
+        // An error occurred while trying to open the file
+        perror("open failed");
+        response = createError500(response);
+        response_str = format_http_response(response);
+        write(client_socket, response_str, strlen(response_str));
+        free(response_str);
+        free(response->headers);
+        free(response);
     }
+    else
+    {
+        // Successfully opened the file, write the request body to it
+        ssize_t status = write(file_fd, request_body, strlen(request_body));
+        if (status == -1)
+        {
+            // An error occurred while trying to write to the file
+            perror("write failed");
+            close(file_fd);
+            return NULL;
+        }
+
+        // Successfully wrote to the file, send a 200 OK response
+        close(file_fd);
+        createSuccess200(response, content_type);
+        response_str = format_http_response(response);
+        write(client_socket, response_str, strlen(response_str));
+        free(response_str);
+        free(response->headers);
+        free(response);
+    }
+
+    // Close the client socket
     close(client_socket);
     return NULL;
 }

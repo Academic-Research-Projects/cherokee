@@ -1,3 +1,4 @@
+/* Set of unit tests written using the Criterion testing framework in C. */
 #include <criterion/criterion.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>

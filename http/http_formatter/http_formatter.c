@@ -1,3 +1,12 @@
+/**
+ * The function `format_http_response` takes a `HttpResponse` struct as input and returns a formatted
+ * string representation of the HTTP response.
+ * 
+ * @param response The `response` parameter is a pointer to a `HttpResponse` struct.
+ * 
+ * @return The function `format_http_response` returns a dynamically allocated string that represents
+ * the formatted HTTP response.
+ */
 #include "http/http_formatter/http_formatter.h"
 #include "http/http_response/http_response.h"
 #include <stdio.h>
