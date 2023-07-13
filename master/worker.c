@@ -51,7 +51,6 @@ void handle_sigint(int sig)
 {
     printf("Received signal %d, shutting down worker %d...\n", sig, getpid());
 
-    free(task);
     close(epoll_fd);
     free(events);
     close(server_socket);
@@ -69,6 +68,12 @@ void handle_sigint(int sig)
         free(threadPool.queue);
         threadPool.queue = NULL;
     }
+
+    // // Free the memory allocated for the task
+    // if (task != NULL) {
+    //     free(task);
+    //     task = NULL;
+    // }
 
     printf("Free worker\n");
     terminate_loop=1;
