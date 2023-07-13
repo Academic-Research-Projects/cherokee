@@ -18,7 +18,7 @@
 #include "http/http_parser/http_parser.h"
 #include "http/http_handler/http_handler.h"
 
-#define MAX_THREADS 1
+#define MAX_THREADS 10
 #define MAX_QUEUE_SIZE 100
 
 void *thread_routine(void *arg)
@@ -35,10 +35,12 @@ void *thread_routine(void *arg)
             pthread_cond_wait(&(threadPool->queue->notEmpty), &(threadPool->queue->mutex));
         }
         printf("Thread %ld woke up\n", pthread_self());
-
-        if (threadPool->terminate_flag == true)
+        // If the terminate flag is set, exit the thread
+        if (threadPool->terminate_flag)
         {
-            break;
+            printf("Thread %ld is exiting\n", pthread_self());
+            pthread_mutex_unlock(&(threadPool->queue->mutex));
+            pthread_exit(NULL);
         }
 
         // Retrieve a task from the queue
@@ -59,6 +61,8 @@ void *thread_routine(void *arg)
         if (!parse_http_request(task->clientSocket, http_request))
         {
             printf("Error parsing header request\n");
+            free(http_request);
+            free(task);
             continue;
         }
 
@@ -68,11 +72,7 @@ void *thread_routine(void *arg)
         free(task);
     }
 
-    printf("Thread %ld exiting...\n", pthread_self());
-    pthread_exit(NULL);
-    // free thread pool
-
-    return NULL;
+    exit(EXIT_SUCCESS);
 }
 
 pthread_t *threadPoolInit(ThreadPool *threadPool, int numThreads)
