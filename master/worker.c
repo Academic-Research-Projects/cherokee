@@ -28,6 +28,45 @@ int terminate_loop = 0;
 ThreadPool threadPool;
 Task *task;
 
+int create_epoll_instance()
+{
+    epoll_fd = epoll_create1(0);
+    if (epoll_fd == -1)
+    {
+        perror("epoll_create1\n");
+        exit(EXIT_FAILURE);
+    }
+    return 0;
+}
+
+struct epoll_event add_server_socket_to_epoll(int *server_socket)
+{
+    struct epoll_event event;
+    memset(&event, 0, sizeof(event));
+    event.events = EPOLLIN;
+    event.data.fd = *server_socket;
+    if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, *server_socket, &event) == -1)
+    {
+        perror("epoll_ctl\n");
+        exit(EXIT_FAILURE);
+    }
+    return event;
+}
+
+int accept_client_connection(int *server_socket)
+{
+    struct sockaddr_in client_addr;
+
+    int new_socket, addrlen = sizeof(client_addr);
+    if ((new_socket = accept(*server_socket, (struct sockaddr *)&client_addr, (socklen_t *)&addrlen)) < 0)
+    {
+        // if cant accept ignore and continue
+        perror("accept\n");
+        return -1;
+    }
+    return new_socket;
+}
+
 void threadPoolDestroy(ThreadPool *threadPool)
 {
     // Set the terminate flag to signal the threads to exit
@@ -70,25 +109,14 @@ void handle_sigint(int sig)
         threadPool.queue = NULL;
     }
 
-    // // Free the memory allocated for the task
-    // if (task != NULL) {
-    //     free(task);
-    //     task = NULL;
-    // }
-
-    printf("Free worker\n");
     terminate_loop = 1;
 }
 
 void handleClientRequest(ThreadPool *threadPool, int clientSocket)
 {
-    // TODO Process the client request
-    // ...
-
     // Create a task
     task = (Task *)malloc(sizeof(Task));
     task->clientSocket = clientSocket;
-    // TODO Set the task arguments
 
     // Enqueue the task to the thread pool
     threadPoolEnqueue(threadPool, task);
@@ -99,39 +127,28 @@ int worker(int *arg)
     // Create and initialize the thread pool
     threadPool.threads = threadPoolInit(&threadPool, MAX_THREADS);
 
-    struct sockaddr_in client_addr;
+    // struct sockaddr_in client_addr;
     server_socket = *arg;
 
     // Create epoll instance
-    epoll_fd = epoll_create1(0);
-    if (epoll_fd == -1)
+    if (create_epoll_instance() == -1)
     {
-        perror("epoll_create1");
         exit(EXIT_FAILURE);
     }
 
     // Add server socket to epoll instance
-    struct epoll_event event;
-    memset(&event, 0, sizeof(event));
-    event.data.fd = server_socket;
-    event.events = EPOLLIN;
-    if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, server_socket, &event) == -1)
-    {
-        perror("epoll_ctl: server_socket");
-        exit(EXIT_FAILURE);
-    }
+    struct epoll_event event = add_server_socket_to_epoll(&server_socket);
 
     // Allocate memory for storing events
     events = malloc(MAX_EVENTS * sizeof(struct epoll_event));
     if (events == NULL)
     {
-        perror("malloc");
+        perror("malloc\n");
         exit(EXIT_FAILURE);
     }
 
     while (!terminate_loop)
     {
-
         // Add signal handler for SIGINT
         signal(SIGINT, handle_sigint);
 
@@ -142,24 +159,19 @@ int worker(int *arg)
             if (events[i].data.fd == server_socket)
             {
                 // new client connection
-                int new_socket, addrlen = sizeof(client_addr);
-                if ((new_socket = accept(server_socket, (struct sockaddr *)&client_addr, (socklen_t *)&addrlen)) < 0)
+                int new_socket = accept_client_connection(&server_socket);
+                if (new_socket == -1)
                 {
-                    // if cant accept ignore and continue
-                    perror("accept");
                     continue;
                 }
-
-                // printf("New client connection, process is %d, socket fd is %d, IP is %s, port is %d\n",
-                //        getpid(), new_socket, inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
 
                 event.events = EPOLLIN | EPOLLET;
                 event.data.fd = new_socket;
 
-                // Add new client socket to epoll instance
+                // add new client socket to epoll instance
                 if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, new_socket, &event) == -1)
                 {
-                    perror("epoll_ctl: new_socket");
+                    perror("epoll_ctl: new_socket\n");
                     exit(EXIT_FAILURE);
                 }
             }
@@ -169,7 +181,7 @@ int worker(int *arg)
                 int client_socket = events[i].data.fd;
                 handleClientRequest(&threadPool, client_socket);
 
-                // Reinitialize event structure
+                // reinitialize event structure
                 event.data.fd = -1;
                 event.events = 0;
             }

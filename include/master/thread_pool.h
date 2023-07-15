@@ -32,6 +32,10 @@ typedef struct
     // ...
 } ThreadPool;
 
+void add_task_to_queue(ThreadPoolQueue *queue, Task *task);
+
+Task *get_task_from_queue(ThreadPoolQueue *queue);
+
 void *thread_routine(void *arg);
 
 pthread_t *threadPoolInit(ThreadPool *threadPool, int numThreads);
