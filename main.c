@@ -18,9 +18,8 @@
 int main()
 {
     // signal(SIGINT, sigint_handler);
-    
     fork_server(PORT);
 
-    printf("Main process %d exiting...\n", getpid());
+    printf("Main exit");
     return 0;
 }

@@ -74,45 +74,45 @@ int *create_server_sockets(int port, int num_workers)
 
 void fork_server(int port)
 {
-    int num_workers = 1; // Number of worker processes
+    int num_workers = 3; // Number of worker processes
 
-    int *worker_sockets = create_server_sockets(port, num_workers);
-
-    // Create worker sockets
-
-    pid_t childPid;
+    pid_t childPids[num_workers];
+    int worker_sockets[num_workers];
 
     for (int i = 0; i < num_workers; i++)
     {
+        childPids[i] = fork();
 
-        childPid = fork();
-
-        if (childPid < 0)
+        if (childPids[i] < 0)
         {
             perror("Error forking the process");
             exit(EXIT_FAILURE);
         }
 
-        if (childPid == 0)
+        if (childPids[i] == 0)
         {
             // This is the child process
             printf("Child process %d\n", getpid());
+
+            // Create the worker socket
+            worker_sockets[i] = create_socket();
+            bind_socket(worker_sockets[i], port);
+            listen_on_socket(worker_sockets[i]);
+
             worker(&worker_sockets[i]);
 
-            printf("Child process %d exiting...\n", getpid());
+            // Close the worker socket
             close(worker_sockets[i]);
 
             // Exit the child process
             // exit(EXIT_SUCCESS);
         }
     }
+
     // Wait for the child processes to exit
     for (int i = 0; i < num_workers; i++)
     {
-        wait(NULL);
+        waitpid(childPids[i], NULL, 0);
     }
-    free(worker_sockets);
     return;
 }
-
-

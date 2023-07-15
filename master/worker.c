@@ -15,17 +15,35 @@
 #include "master/worker.h"
 #include "master/thread_pool.h"
 
-#define MAX_THREADS 1
+#define MAX_THREADS 2
 #define MAX_QUEUE_SIZE 10
 #define MAX_EVENTS 1000
 
 int epoll_fd;
 struct epoll_event *events;
 bool loop = true;
+int server_socket;
 // Flag to indicate whether the loop should be terminated
-volatile sig_atomic_t terminate_loop = 0;
+int terminate_loop = 0;
 ThreadPool threadPool;
 Task *task;
+
+void threadPoolDestroy(ThreadPool *threadPool)
+{
+    // Set the terminate flag to signal the threads to exit
+    threadPool->terminate_flag = true;
+
+    // Signal the notEmpty condition variable to wake up any threads that are waiting for a task
+    pthread_mutex_lock(&(threadPool->queue->mutex));
+    pthread_cond_broadcast(&(threadPool->queue->notEmpty));
+    pthread_mutex_unlock(&(threadPool->queue->mutex));
+
+    // Wait for all threads to exit
+    for (int i = 0; i < threadPool->numThreads; i++)
+    {
+        pthread_join(threadPool->threads[i], NULL);
+    }
+}
 
 // Signal handler for SIGINT
 void handle_sigint(int sig)
@@ -34,27 +52,33 @@ void handle_sigint(int sig)
 
     close(epoll_fd);
     free(events);
+    close(server_socket);
 
-    threadPool.terminate_flag = true;
-    // Notify all threads that the terminate flag is 1
-    pthread_cond_broadcast(&(threadPool.queue->notEmpty));
+    threadPoolDestroy(&threadPool);
 
-    // Join threads
-    for (int i = 0; i < threadPool.numThreads; i++)
+    // Free the memory allocated for the thread pool
+    if (threadPool.threads != NULL)
     {
-        pthread_join(threadPool.threads[i], NULL);
+        free(threadPool.threads);
+        threadPool.threads = NULL;
+    }
+    if (threadPool.queue != NULL)
+    {
+        free(threadPool.queue->queue);
+        threadPool.queue->queue = NULL;
+        free(threadPool.queue);
+        threadPool.queue = NULL;
     }
 
-    free(threadPool.threads);
-    free(threadPool.queue->queue);
-    free(threadPool.queue);
-    free(task);
+    // // Free the memory allocated for the task
+    // if (task != NULL) {
+    //     free(task);
+    //     task = NULL;
+    // }
 
-    printf("loop = false\n");
-    loop = false;
+    printf("Free worker\n");
     terminate_loop = 1;
 }
-
 
 void handleClientRequest(ThreadPool *threadPool, int clientSocket)
 {
@@ -76,7 +100,7 @@ int worker(int *arg)
     threadPool.threads = threadPoolInit(&threadPool, MAX_THREADS);
 
     struct sockaddr_in client_addr;
-    int server_socket = *arg;
+    server_socket = *arg;
 
     // Create epoll instance
     epoll_fd = epoll_create1(0);
@@ -107,6 +131,7 @@ int worker(int *arg)
 
     while (!terminate_loop)
     {
+
         // Add signal handler for SIGINT
         signal(SIGINT, handle_sigint);
 
@@ -150,6 +175,6 @@ int worker(int *arg)
             }
         }
     }
-    
+
     return 0;
 }
