@@ -1,264 +1,205 @@
 #include <criterion/criterion.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
+#include <criterion/redirect.h>
 #include <unistd.h>
+#include <criterion/assert.h>
+#include <string.h>
+#include <stddef.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <sys/socket.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-#include "http/http_request/http_request.h"
-#include "http/http_response/http_response.h"
-#include "http/http_parser/http_parser.h"
+#include "crud_operations/http_post.h"
 #include "http/http_formatter/http_formatter.h"
-#include "http_post.h"
+#include "http/http_parser/http_parser.h"
+#include "http/http_response/http_response.h"
+#include "http/http_request/http_request.h"
+#include "status_codes/http_status_codes.h"
 
 #define PORT 8080
 #define BASE_DIRECTORY "test_files"
+#define RESPONSE_BUFFER_SIZE 4096
+#define FILE_PATH_SIZE 512
+#define BUFFER_SIZE 1024
 
-void create_test_file(char *file_path, char *file_contents)
+void *http_post(HttpRequest *request, int client_socket);
+
+// Test creating a new file with a valid request body
+Test(http_post, create_new_file_with_request_body)
 {
-    FILE *file = fopen(file_path, "w");
-    if (file == NULL)
-    {
-        perror("File creation error");
-        exit(EXIT_FAILURE);
-    }
-    fprintf(file, "%s", file_contents);
-    fclose(file);
+    // Redirect stdout to a buffer to capture the response
+    char response_buffer[RESPONSE_BUFFER_SIZE];
+    cr_redirect_stdout_to_buffer(response_buffer, RESPONSE_BUFFER_SIZE);
+
+    // Create a test request
+    HttpRequest request = {
+        .body = "This is a test request body.",
+        .request_line = {
+            .method = "POST",
+            .requestTarget = "/test.txt",
+            .httpVersion = "HTTP/1.1"
+        }
+    };
+    
+    // Call the http_post function
+    http_post(&request, 1);
+
+    // Check that the file was created
+    FILE *file_handle = fopen("test_files/test.txt", "r");
+    cr_assert_not_null(file_handle, "File was not created");
+
+    // Check that the file contents match the request body
+    char file_contents[BUFFER_SIZE];
+    fgets(file_contents, BUFFER_SIZE, file_handle);
+    cr_assert_str_eq(file_contents, "This is a test request body.", "File contents do not match request body");
+
+    // Check that the response is correct
+    char expected_response[] = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n";
+    cr_assert_str_eq(response_buffer, expected_response, "Response is incorrect");
+
+    // Clean up
+    fclose(file_handle);
+    remove("test_files/test.txt");
 }
 
-void delete_test_file(char *file_path)
+// Test creating a new file without a request body
+Test(http_post, create_new_file_without_request_body)
 {
-    remove(file_path);
+    // Redirect stdout to a buffer to capture the response
+    char response_buffer[RESPONSE_BUFFER_SIZE];
+    cr_redirect_stdout_to_buffer(response_buffer, RESPONSE_BUFFER_SIZE);
+
+    // Create a test request
+    HttpRequest request = {
+        .body = NULL,
+        .request_line = {
+            .method = "POST",
+            .requestTarget = "/test.txt",
+            .httpVersion = "HTTP/1.1"
+        }
+    };
+
+    // Call the http_post function
+    http_post(&request, 1);
+
+    // Check that the file was created
+    FILE *file_handle = fopen("test_files/test.txt", "r");
+    cr_assert_not_null(file_handle, "File was not created");
+
+    // Check that the file contents are empty
+    char file_contents[BUFFER_SIZE];
+    fgets(file_contents, BUFFER_SIZE, file_handle);
+    cr_assert_str_empty(file_contents, "File contents are not empty");
+
+    // Check that the response is correct
+    char expected_response[] = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n";
+    cr_assert_str_eq(response_buffer, expected_response, "Response is incorrect");
+
+    // Clean up
+    fclose(file_handle);
+    remove("test_files/test.txt");
 }
 
-Test(http_post, test_create_file)
+// Test creating a new file with an invalid file extension
+Test(http_post, create_new_file_with_invalid_file_extension)
 {
-    // create a valid HTTP request
-    struct HttpRequest *request = malloc(sizeof(struct HttpRequest));
-    request->method = "POST";
-    request->request_line.requestTarget = "/test.html";
-    request->body = "This is a test file.";
+    // Redirect stdout to a buffer to capture the response
+    char response_buffer[RESPONSE_BUFFER_SIZE];
+    cr_redirect_stdout_to_buffer(response_buffer, RESPONSE_BUFFER_SIZE);
 
-    // create a mock client socket
-    int client_socket = socket(AF_INET, SOCK_STREAM, 0);
-    struct sockaddr_in server_address;
-    server_address.sin_family = AF_INET;
-    server_address.sin_addr.s_addr = INADDR_ANY;
-    server_address.sin_port = htons(PORT);
-    int connection_status = connect(client_socket, (struct sockaddr *)&server_address, sizeof(server_address));
-    if (connection_status == -1)
-    {
-        perror("Connection error");
-        exit(EXIT_FAILURE);
-    }
+    // Create a test request
+    HttpRequest request = {
+        .body = "This is a test request body.",
+        .request_line = {
+            .method = "POST",
+            .requestTarget = "/test.xyz",
+            .httpVersion = "HTTP/1.1"
+        }
+    };
 
-    // call the http_post function
-    http_post(request, client_socket);
+    // Call the http_post function
+    http_post(&request, 1);
 
-    // check that the file was created
-    char *file_path = "test_files/test.html";
-    struct stat file_stats;
-    int status = stat(file_path, &file_stats);
-    cr_assert_eq(status, 0, "Expected file to be created");
+    // Check that the file was not created
+    FILE *file_handle = fopen("test_files/test.xyz", "r");
+    cr_assert_null(file_handle, "File was created with invalid file extension");
 
-    // delete the test file
-    delete_test_file(file_path);
+    // Check that the response is correct
+    char expected_response[] = "HTTP/1.1 415 Unsupported Media Type\r\nContent-Type: text/plain\r\n\r\n";
+    cr_assert_str_eq(response_buffer, expected_response, "Response is incorrect");
+
+    // Clean up
+    remove("test_files/test.xyz");
 }
 
-Test(http_post, test_create_file_with_content)
+// Test creating a new file with an existing file name
+Test(http_post, create_new_file_with_existing_file_name)
 {
-    // create a valid HTTP request
-    struct HttpRequest *request = malloc(sizeof(struct HttpRequest));
-    request->method = "POST";
-    request->request_line.requestTarget = "/test.html";
-    request->body = "This is a test file.";
+    // Redirect stdout to a buffer to capture the response
+    char response_buffer[RESPONSE_BUFFER_SIZE];
+    cr_redirect_stdout_to_buffer(response_buffer, RESPONSE_BUFFER_SIZE);
 
-    // create a mock client socket
-    int client_socket = socket(AF_INET, SOCK_STREAM, 0);
-    struct sockaddr_in server_address;
-    server_address.sin_family = AF_INET;
-    server_address.sin_addr.s_addr = INADDR_ANY;
-    server_address.sin_port = htons(PORT);
-    int connection_status = connect(client_socket, (struct sockaddr *)&server_address, sizeof(server_address));
-    if (connection_status == -1)
-    {
-        perror("Connection error");
-        exit(EXIT_FAILURE);
-    }
+    // Create a test file
+    FILE *file_handle = fopen("test_files/test.txt", "w");
+    fprintf(file_handle, "This is a test file.");
+    fclose(file_handle);
 
-    // call the http_post function
-    http_post(request, client_socket);
+    // Create a test request
+    HttpRequest request = {
+        .body = "This is a test request body.",
+        .request_line = {
+            .method = "POST",
+            .requestTarget = "/test.txt",
+            .httpVersion = "HTTP/1.1"
+        }
+    };
 
-    // check that the file was created with the correct content
-    char *file_path = "test_files/test.html";
-    char expected_content[] = "This is a test file.";
-    char actual_content[1024];
-    FILE *file = fopen(file_path, "r");
-    if (file == NULL)
-    {
-        perror("File read error");
-        exit(EXIT_FAILURE);
-    }
-    fgets(actual_content, sizeof(actual_content), file);
-    fclose(file);
-    cr_assert_str_eq(actual_content, expected_content, "Expected file content to be '%s'", expected_content);
+    // Call the http_post function
+    http_post(&request, 1);
 
-    // delete the test file
-    delete_test_file(file_path);
+    // Check that the file was not overwritten
+    file_handle = fopen("test_files/test.txt", "r");
+    char file_contents[BUFFER_SIZE];
+    fgets(file_contents, BUFFER_SIZE, file_handle);
+    cr_assert_str_eq(file_contents, "This is a test file.", "File was overwritten");
+
+    // Check that the response is correct
+    char expected_response[] = "HTTP/1.1 409 Conflict\r\nContent-Type: text/plain\r\n\r\n";
+    cr_assert_str_eq(response_buffer, expected_response, "Response is incorrect");
+
+    // Clean up
+    fclose(file_handle);
+    remove("test_files/test.txt");
 }
 
-Test(http_post, test_create_file_with_existing_file)
+// Test creating a new file with a missing file name
+Test(http_post, create_new_file_with_missing_file_name)
 {
-    // create a valid HTTP request
-    struct HttpRequest *request = malloc(sizeof(struct HttpRequest));
-    request->method = "POST";
-    request->request_line.requestTarget = "/test.html";
-    request->body = "This is a test file.";
+    // Redirect stdout to a buffer to capture the response
+    char response_buffer[RESPONSE_BUFFER_SIZE];
+    cr_redirect_stdout_to_buffer(response_buffer, RESPONSE_BUFFER_SIZE);
 
-    // create a mock client socket
-    int client_socket = socket(AF_INET, SOCK_STREAM, 0);
-    struct sockaddr_in server_address;
-    server_address.sin_family = AF_INET;
-    server_address.sin_addr.s_addr = INADDR_ANY;
-    server_address.sin_port = htons(PORT);
-    int connection_status = connect(client_socket, (struct sockaddr *)&server_address, sizeof(server_address));
-    if (connection_status == -1)
-    {
-        perror("Connection error");
-        exit(EXIT_FAILURE);
-    }
+    // Create a test request
+    HttpRequest request = {
+        .body = "This is a test request body.",
+        .request_line = {
+            .method = "POST",
+            .requestTarget = "/",
+            .httpVersion = "HTTP/1.1"
+        }
+    };
 
-    // create an existing test file
-    char *file_path = "test_files/test.html";
-    char *file_contents = "This is an existing test file.";
-    create_test_file(file_path, file_contents);
+    // Call the http_post function
+    http_post(&request, 1);
 
-    // call the http_post function
-    http_post(request, client_socket);
+    // Check that the file was not created
+    FILE *file_handle = fopen("test_files/", "r");
+    cr_assert_null(file_handle, "File was created with missing file name");
 
-    // check that the file was not modified
-    char expected_content[] = "This is an existing test file.";
-    char actual_content[1024];
-    FILE *file = fopen(file_path, "r");
-    if (file == NULL)
-    {
-        perror("File read error");
-        exit(EXIT_FAILURE);
-    }
-    fgets(actual_content, sizeof(actual_content), file);
-    fclose(file);
-    cr_assert_str_eq(actual_content, expected_content, "Expected file content to be '%s'", expected_content);
+    // Check that the response is correct
+    char expected_response[] = "HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\n\r\n";
+    cr_assert_str_eq(response_buffer, expected_response, "Response is incorrect");
 
-    // delete the test file
-    delete_test_file(file_path);
-}
-
-Test(http_post, test_create_file_with_invalid_extension)
-{
-    // create a valid HTTP request
-    struct HttpRequest *request = malloc(sizeof(struct HttpRequest));
-    request->method = "POST";
-    request->request_line.requestTarget = "/test.txt";
-    request->body = "This is a test file.";
-
-    // create a mock client socket
-    int client_socket = socket(AF_INET, SOCK_STREAM, 0);
-    struct sockaddr_in server_address;
-    server_address.sin_family = AF_INET;
-    server_address.sin_addr.s_addr = INADDR_ANY;
-    server_address.sin_port = htons(PORT);
-    int connection_status = connect(client_socket, (struct sockaddr *)&server_address, sizeof(server_address));
-    if (connection_status == -1)
-    {
-        perror("Connection error");
-        exit(EXIT_FAILURE);
-    }
-
-    // call the http_post function
-    http_post(request, client_socket);
-
-    // check that the response is a 415 Unsupported Media Type error
-    char expected_response[] = "HTTP/1.1 415 Unsupported Media Type\r\nContent-Type: text/plain\r\nContent-Length: 0\r\n\r\n";
-    char actual_response[1024];
-    int bytes_received = recv(client_socket, actual_response, sizeof(actual_response), 0);
-    cr_assert_eq(bytes_received, strlen(expected_response), "Expected response length to be %d", strlen(expected_response));
-    cr_assert_str_eq(actual_response, expected_response, "Expected response to be '%s'", expected_response);
-}
-
-Test(http_post, test_create_file_with_existing_file_error)
-{
-    // create a valid HTTP request
-    struct HttpRequest *request = malloc(sizeof(struct HttpRequest));
-    request->method = "POST";
-    request->request_line.requestTarget = "/test.html";
-    request->body = "This is a test file.";
-
-    // create a mock client socket
-    int client_socket = socket(AF_INET, SOCK_STREAM, 0);
-    struct sockaddr_in server_address;
-    server_address.sin_family = AF_INET;
-    server_address.sin_addr.s_addr = INADDR_ANY;
-    server_address.sin_port = htons(PORT);
-    int connection_status = connect(client_socket, (struct sockaddr *)&server_address, sizeof(server_address));
-    if (connection_status == -1)
-    {
-        perror("Connection error");
-        exit(EXIT_FAILURE);
-    }
-
-    // create an existing test file
-    char *file_path = "test_files/test.html";
-    char *file_contents = "This is an existing test file.";
-    create_test_file(file_path, file_contents);
-
-    // call the http_post function
-    http_post(request, client_socket);
-
-    // check that the response is a 409 Conflict error
-    char expected_response[] = "HTTP/1.1 409 Conflict\r\nContent-Type: text/plain\r\nContent-Length: 0\r\n\r\n";
-    char actual_response[1024];
-    int bytes_received = recv(client_socket, actual_response, sizeof(actual_response), 0);
-    cr_assert_eq(bytes_received, strlen(expected_response), "Expected response length to be %d", strlen(expected_response));
-    cr_assert_str_eq(actual_response, expected_response, "Expected response to be '%s'", expected_response);
-
-    // delete the test file
-    delete_test_file(file_path);
-}
-
-Test(http_post, test_create_file_with_file_creation_error)
-{
-    // create a valid HTTP request
-    struct HttpRequest *request = malloc(sizeof(struct HttpRequest));
-    request->method = "POST";
-    request->request_line.requestTarget = "/test.html";
-    request->body = "This is a test file.";
-
-    // create a mock client socket
-    int client_socket = socket(AF_INET, SOCK_STREAM, 0);
-    struct sockaddr_in server_address;
-    server_address.sin_family = AF_INET;
-    server_address.sin_addr.s_addr = INADDR_ANY;
-    server_address.sin_port = htons(PORT);
-    int connection_status = connect(client_socket, (struct sockaddr *)&server_address, sizeof(server_address));
-    if (connection_status == -1)
-    {
-        perror("Connection error");
-        exit(EXIT_FAILURE);
-    }
-
-    // create a read-only directory
-    char *dir_path = "test_files_readonly";
-    mkdir(dir_path, 0444);
-
-    // call the http_post function
-    http_post(request, client_socket);
-
-    // check that the response is a 500 Internal Server Error
-    char expected_response[] = "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/plain\r\nContent-Length: 0\r\n\r\n";
-    char actual_response[1024];
-    int bytes_received = recv(client_socket, actual_response, sizeof(actual_response), 0);
-    cr_assert_eq(bytes_received, strlen(expected_response), "Expected response length to be %d", strlen(expected_response));
-    cr_assert_str_eq(actual_response, expected_response, "Expected response to be '%s'", expected_response);
-
-    // delete the test directory
-    rmdir(dir_path);
+    // Clean up
+    remove("test_files/");
 }
