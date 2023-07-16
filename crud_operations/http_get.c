@@ -33,15 +33,16 @@ void *http_get(HttpRequest *request, int client_socket)
     // Construct the complete file path
     char file_path[512] = {0};
     snprintf(file_path, sizeof(file_path), "%s/%s", BASE_DIRECTORY, request_target);
+    puts(file_path);
 
     // Print request
     // printf("Request: %s\n", request_target);
 
-    // Default content type
-    char *content_type = "text/plain";
-
     struct HttpResponse *response = malloc(sizeof(struct HttpResponse));
     char *response_str;
+
+    // Default content type
+    char *content_type = "text/plain";
 
     // Open the requested file
     int file_fd = open(file_path, O_RDONLY);
@@ -75,7 +76,8 @@ void *http_get(HttpRequest *request, int client_socket)
         createSuccess200(response, content_type);
         response_str = format_http_response(response);
 
-        // printf("Response: %s\n", response_str);
+        printf("Response: %s\n", response_str);
+        printf("client_socket: %d\n", client_socket);
 
         write(client_socket, response_str, strlen(response_str));
 

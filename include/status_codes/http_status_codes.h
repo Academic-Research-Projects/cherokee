@@ -3,7 +3,8 @@
 
 #include "http/http_response/http_response.h"
 
-typedef enum {
+typedef enum
+{
     HTTP_OK = 200,
     HTTP_CREATED = 201,
     HTTP_NO_CONTENT = 204,
@@ -17,8 +18,7 @@ typedef enum {
     HTTP_INTERNAL_SERVER_ERROR = 500
 } HttpStatusCode;
 
-
-//Client Error Handling
+// Client Error Handling
 HttpResponse *createError404(HttpResponse *response);
 HttpResponse *createError400(HttpResponse *response);
 HttpResponse *createError401(HttpResponse *response);
@@ -26,13 +26,12 @@ HttpResponse *createError403(HttpResponse *response);
 HttpResponse *createError405(HttpResponse *response);
 HttpResponse *createError409(HttpResponse *response);
 
-//Server Error Handling
+// Server Error Handling
 HttpResponse *createError500(HttpResponse *response);
 
-//Success Handling
+// Success Handling
 HttpResponse *createSuccess200(HttpResponse *response, char *content_type);
 HttpResponse *createSuccess201(HttpResponse *response);
-HttpResponse *createSuccess204(HttpResponse *response);
-
+HttpResponse *createSuccess204(HttpResponse *response); //, char *content_type);
 
 #endif

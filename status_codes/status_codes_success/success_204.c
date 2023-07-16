@@ -9,12 +9,21 @@ char *noContentMessage(void)
     return "No Content\n";
 }
 
-HttpResponse *createSuccess204(HttpResponse *response)
+HttpResponse *createSuccess204(HttpResponse *response) //, char *content_type)
 {
-    response->httpVersion = strdup("HTTP/1.1");
+    response->headers = malloc(sizeof(struct ResponseHeaders));
+    response->headers->name = "Content-Type";
+    response->headers->value = "text/plain";
+    response->httpVersion = "HTTP/1.1";
     response->statusCode = 204;
     response->statusText = noContentMessage();
-    response->headers = NULL;
-    response->body = NULL;
+    response->body = strdup(noContentMessage());
+    // response->httpVersion = strdup("HTTP/1.1");
+    // response->statusCode = 204;
+    // response->statusText = noContentMessage();
+    // response->headers->name = "Content-Type";
+    // response->headers->value = content_type;
+    // response->headers = NULL;
+    // response->body = NULL;
     return response;
 }

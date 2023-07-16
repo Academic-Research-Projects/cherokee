@@ -46,16 +46,18 @@ By successfully completing the Cherokee project, you will gain a deeper understa
     - over time : `siege -c 100 -t10s '127.0.0.1:8080/index.html'`
     - over number of requests : `siege -c 100 -r100 '127.0.0.1:8080/index.html'`
 
-## How to test
+## How to test the HTTP GET request, asking for a .json file
 - Open another terminal
 - Execute `curl http://localhost:8080/zoubisou.json`
-- You should see a "Hello, World" in the client terminal
+- You should see a "json-formatted file" in the client terminal
 - This is the output expected from the server, in your server terminal :
 
 `GET / HTTP/1.1
 Host: localhost:8080
 User-Agent: curl/7.74.0
 Accept: */*`
+
+`The zou-bisou.json file`
 
 ## How to test the HTTP POST request, posting a .txt file
 - Open another terminal

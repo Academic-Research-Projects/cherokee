@@ -13,8 +13,9 @@ $(wildcard status_codes/status_codes_errors/*/*.c) \
 status_codes/http_status_codes.c
 
 OBJS=$(SRCS:.c=.o)
-TEST_SRCS = $(wildcard test/*.c) $(wildcard master/*.c) $(wildcard crud_operations/*.c)
+TEST_SRCS = $(wildcard test/*.c) $(wildcard master/*.c) $(wildcard crud_operations/*.c) $(wildcard http/*/*.c) $(wildcard status_codes/status_codes_success/*.c) $(wildcard status_codes/status_codes_errors/*/*.c) 
 TEST_OBJS = $(TEST_SRCS:.c=.o)
+TEST_TARGET = test_cherokee
 
 .PHONY: all clean test
 
