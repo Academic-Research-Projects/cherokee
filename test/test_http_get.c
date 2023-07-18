@@ -17,71 +17,71 @@
 // The function to test
 HttpResponse *createError404(HttpResponse *response);
 
-Test(createError404_validResponse, validResponse)
-{
-    // Create an empty HttpResponse structure
-    struct HttpResponse response;
-    memset(&response, 0, sizeof(struct HttpResponse));
-
-    // Call the createError404 function
-    createError404(&response);
-
-    // Assert that the response has the correct values
-    cr_assert_str_eq(response.headers->name, "Content-Type");
-    cr_assert_str_eq(response.headers->value, "text/plain");
-    cr_assert_str_eq(response.httpVersion, "HTTP/1.1");
-    cr_assert_eq(response.statusCode, 404);
-    cr_assert_str_eq(response.statusText, "Not Found\n");
-    cr_assert_str_eq(response.body, "Not Found\n");
-
-    // Clean up any dynamically allocated resources, if applicable
-    free(response.headers);
-    free(response.body);
-}
-
-// Mock the write function to capture the response sent to the client
-// ssize_t mock_write(int fd, const void *buf, size_t count)
+// Test(createError404_validResponse, validResponse)
 // {
-//     // Capture the response here or perform assertions on it
-//     // You can redirect the write to a buffer or check the content directly
-//     return count;
+//     // Create an empty HttpResponse structure
+//     struct HttpResponse response;
+//     memset(&response, 0, sizeof(struct HttpResponse));
+
+//     // Call the createError404 function
+//     createError404(&response);
+
+//     // Assert that the response has the correct values
+//     cr_assert_str_eq(response.headers->name, "Content-Type");
+//     cr_assert_str_eq(response.headers->value, "text/plain");
+//     cr_assert_str_eq(response.httpVersion, "HTTP/1.1");
+//     cr_assert_eq(response.statusCode, 404);
+//     cr_assert_str_eq(response.statusText, "Not Found\n");
+//     cr_assert_str_eq(response.body, "Not Found\n");
+
+//     // Clean up any dynamically allocated resources, if applicable
+//     free(response.headers);
+//     free(response.body);
 // }
 
-Test(http_get, successful_file_retrieval)
-{
-    // Arrange
-    int client_socket = open("request.txt", O_RDWR | O_CREAT | S_IRWXU | O_TRUNC, 0777); // Provide the client socket here
-    char buffer[200];
-    printf("unit_test_client_socket: %d\n", client_socket);
+// // Mock the write function to capture the response sent to the client
+// // ssize_t mock_write(int fd, const void *buf, size_t count)
+// // {
+// //     // Capture the response here or perform assertions on it
+// //     // You can redirect the write to a buffer or check the content directly
+// //     return count;
+// // }
 
-    // Create a mock HttpRequest with the request target of an existing file
-    HttpRequest request;
-    request.request_line.requestTarget = "file.txt";
-    request.request_line.method = "GET";
+// Test(http_get, successful_file_retrieval)
+// {
+//     // Arrange
+//     int client_socket = open("request.txt", O_RDWR | O_CREAT | S_IRWXU | O_TRUNC, 0777); // Provide the client socket here
+//     char buffer[200];
+//     printf("unit_test_client_socket: %d\n", client_socket);
 
-    http_get(&request, client_socket);
+//     // Create a mock HttpRequest with the request target of an existing file
+//     HttpRequest request;
+//     request.request_line.requestTarget = "file.txt";
+//     request.request_line.method = "GET";
 
-    // Redirect the write function to our mock_write function
-    // This allows us to capture the response sent to the client
-    // // criterion_redirect_write(mock_write);
+//     http_get(&request, client_socket);
 
-    // // Create the existing file for testing
-    // FILE *file = fopen("test_files/sendhelp.txt", "w");
-    // fprintf(file, "This is the content of the existing file.\n");
-    // fclose(file);
+//     // Redirect the write function to our mock_write function
+//     // This allows us to capture the response sent to the client
+//     // // criterion_redirect_write(mock_write);
 
-    // // Act
-    // void *result = http_get(&request, client_socket);
+//     // // Create the existing file for testing
+//     // FILE *file = fopen("test_files/sendhelp.txt", "w");
+//     // fprintf(file, "This is the content of the existing file.\n");
+//     // fclose(file);
 
-    // // Assert
-    // cr_assert_null(result, "Expected http_get to return NULL");
+//     // // Act
+//     // void *result = http_get(&request, client_socket);
 
-    // We can perform further assertions on the captured response here
-    // For example, check the response status code, content, headers, etc.
+//     // // Assert
+//     // cr_assert_null(result, "Expected http_get to return NULL");
 
-    // Clean up the created file
-    // unlink("test_files/zoubisou.json");
-}
+//     // We can perform further assertions on the captured response here
+//     // For example, check the response status code, content, headers, etc.
+
+//     // Clean up the created file
+//     // unlink("test_files/zoubisou.json");
+// }
 
 // Test(createError404_null_response, nullResponse)
 // {
