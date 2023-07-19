@@ -1,12 +1,12 @@
 /**
  * The function `http_head` handles a HEAD request by opening the requested file, determining its
  * content type, and sending the appropriate response headers.
- * 
+ *
  * @param request The parameter "request" is a pointer to an instance of the HttpRequest struct. It
  * contains information about the HTTP request, such as the request line, headers, and request target.
  * @param client_socket The `client_socket` parameter is the file descriptor for the socket connection
  * between the server and the client. It is used to send the HTTP response back to the client.
- * 
+ *
  * @return a NULL pointer.
  */
 #include "../include/http/http_response/http_response.h"
@@ -98,9 +98,12 @@ void *http_head(HttpRequest *request, int client_socket)
                 printf("Test content file txt.\n");
                 // send response headers
                 // TODO : refactoriser 204 response
-                char response[RESPONSE_BUFFER_SIZE];
-                snprintf(response, RESPONSE_BUFFER_SIZE, "HTTP/1.1 204 OK\r\nContent-Type: %s\r\nContent-Length: %s\r\nLast-Modified: %s\r\nETag: %s\r\n\r\n", content_type, "future content length", "future last modified", "future ETag");
-                write(client_socket, response, strlen(response));
+                response = createSuccess200(response, content_type);
+                response_str = format_http_response(response);
+                printf("Response: %s\n", response_str);
+                // char response[RESPONSE_BUFFER_SIZE];
+                // snprintf(response, RESPONSE_BUFFER_SIZE, "HTTP/1.1 204 OK\r\nContent-Type: %s\r\nContent-Length: %s\r\nLast-Modified: %s\r\nETag: %s\r\n\r\n", content_type, "future content length", "future last modified", "future ETag");
+                write(client_socket, response_str, strlen(response_str));
             }
         }
     }
