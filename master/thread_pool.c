@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <stdbool.h>
 
 #include "master/thread_pool.h"
 // #include "../crud_operations/http_head.h"
@@ -25,6 +26,42 @@
 
 #define MAX_THREADS 10
 #define MAX_QUEUE_SIZE 100
+
+void add_task_to_queue(ThreadPoolQueue *queue, Task *task)
+{
+    queue->rear = (queue->rear + 1) % queue->capacity;
+    queue->queue[queue->rear] = task;
+    queue->size++;
+}
+
+Task *get_task_from_queue(ThreadPoolQueue *queue)
+{
+    Task *task = queue->queue[queue->front];
+    queue->front = (queue->front + 1) % queue->capacity;
+    queue->size--;
+
+    // Notify that the queue is not full
+    pthread_cond_signal(&(queue->notFull));
+    return task;
+}
+
+void add_task_to_queue(ThreadPoolQueue *queue, Task *task)
+{
+    queue->rear = (queue->rear + 1) % queue->capacity;
+    queue->queue[queue->rear] = task;
+    queue->size++;
+}
+
+Task *get_task_from_queue(ThreadPoolQueue *queue)
+{
+    Task *task = queue->queue[queue->front];
+    queue->front = (queue->front + 1) % queue->capacity;
+    queue->size--;
+
+    // Notify that the queue is not full
+    pthread_cond_signal(&(queue->notFull));
+    return task;
+}
 
 /**
  * The function `thread_routine` is a worker thread function that retrieves tasks from a queue,
@@ -45,18 +82,20 @@ void *thread_routine(void *arg)
         pthread_mutex_lock(&(threadPool->queue->mutex));
 
         // Wait for a task to be available
-        while (threadPool->queue->size == 0)
+        while (threadPool->queue->size == 0 && threadPool->terminate_flag == 0)
         {
             pthread_cond_wait(&(threadPool->queue->notEmpty), &(threadPool->queue->mutex));
         }
 
-        // Retrieve a task from the queue
-        Task *task = threadPool->queue->queue[threadPool->queue->front];
-        threadPool->queue->front = (threadPool->queue->front + 1) % threadPool->queue->capacity;
-        threadPool->queue->size--;
+        // If the terminate flag is set, exit the thread
+        if (threadPool->terminate_flag)
+        {
+            pthread_mutex_unlock(&(threadPool->queue->mutex));
+            pthread_exit(NULL);
+        }
 
-        // Notify that the queue is not full
-        pthread_cond_signal(&(threadPool->queue->notFull));
+        // Retrieve a task from the queue
+        Task *task = get_task_from_queue(threadPool->queue);
 
         pthread_mutex_unlock(&(threadPool->queue->mutex));
 
@@ -67,7 +106,9 @@ void *thread_routine(void *arg)
         struct HttpRequest *http_request = malloc(sizeof(struct HttpRequest));
         if (!parse_http_request(task->clientSocket, http_request))
         {
-            printf("Error parsing header request\n");
+            perror("parsing header request\n");
+            free(http_request);
+            free(task);
             continue;
         }
 
@@ -77,22 +118,14 @@ void *thread_routine(void *arg)
         free(task);
     }
 
-    return NULL;
+    exit(EXIT_SUCCESS);
 }
 
-/**
- * The function initializes a thread pool with a specified number of threads and sets up the necessary
- * data structures for task management.
- * 
- * @param threadPool A pointer to a ThreadPool struct, which contains information about the thread
- * pool.
- * @param numThreads The `numThreads` parameter specifies the number of threads that will be created in
- * the thread pool.
- */
-void threadPoolInit(ThreadPool *threadPool, int numThreads)
+pthread_t *threadPoolInit(ThreadPool *threadPool, int numThreads)
 {
     threadPool->threads = (pthread_t *)malloc(sizeof(pthread_t) * numThreads);
     threadPool->numThreads = numThreads;
+    threadPool->terminate_flag = false;
 
     threadPool->queue = (ThreadPoolQueue *)malloc(sizeof(ThreadPoolQueue));
     threadPool->queue->queue = (Task **)malloc(sizeof(Task *) * MAX_QUEUE_SIZE);
@@ -109,6 +142,8 @@ void threadPoolInit(ThreadPool *threadPool, int numThreads)
     {
         pthread_create(&(threadPool->threads[i]), NULL, thread_routine, (void *)threadPool);
     }
+
+    return threadPool->threads;
 }
 
 /**
@@ -130,9 +165,7 @@ void threadPoolEnqueue(ThreadPool *threadPool, Task *task)
     }
 
     // Add the task to the queue
-    threadPool->queue->rear = (threadPool->queue->rear + 1) % threadPool->queue->capacity;
-    threadPool->queue->queue[threadPool->queue->rear] = task;
-    threadPool->queue->size++;
+    add_task_to_queue(threadPool->queue, task);
 
     // Notify that the queue is not empty
     pthread_cond_signal(&(threadPool->queue->notEmpty));
