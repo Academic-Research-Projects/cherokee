@@ -39,13 +39,13 @@ int create_epoll_instance()
     return 0;
 }
 
-struct epoll_event add_server_socket_to_epoll(int *server_socket)
+struct epoll_event add_server_socket_to_epoll(int *server_socket, int *epoll_fd)
 {
     struct epoll_event event;
     memset(&event, 0, sizeof(event));
     event.events = EPOLLIN;
     event.data.fd = *server_socket;
-    if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, *server_socket, &event) == -1)
+    if (epoll_ctl(*epoll_fd, EPOLL_CTL_ADD, *server_socket, &event) == -1)
     {
         perror("epoll_ctl\n");
         exit(EXIT_FAILURE);
@@ -137,7 +137,7 @@ int worker(int *arg)
     }
 
     // Add server socket to epoll instance
-    struct epoll_event event = add_server_socket_to_epoll(&server_socket);
+    struct epoll_event event = add_server_socket_to_epoll(&server_socket, &epoll_fd);
 
     // Allocate memory for storing events
     events = malloc(MAX_EVENTS * sizeof(struct epoll_event));

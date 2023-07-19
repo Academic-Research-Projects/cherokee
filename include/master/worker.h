@@ -5,7 +5,7 @@
 
 int create_epoll_instance();
 
-struct epoll_event add_server_socket_to_epoll(int *server_socket);
+struct epoll_event add_server_socket_to_epoll(int *server_socket, int *epoll_fd);
 
 int accept_client_connection(int *server_socket);
 
