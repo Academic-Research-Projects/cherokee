@@ -45,24 +45,6 @@ Task *get_task_from_queue(ThreadPoolQueue *queue)
     return task;
 }
 
-void add_task_to_queue(ThreadPoolQueue *queue, Task *task)
-{
-    queue->rear = (queue->rear + 1) % queue->capacity;
-    queue->queue[queue->rear] = task;
-    queue->size++;
-}
-
-Task *get_task_from_queue(ThreadPoolQueue *queue)
-{
-    Task *task = queue->queue[queue->front];
-    queue->front = (queue->front + 1) % queue->capacity;
-    queue->size--;
-
-    // Notify that the queue is not full
-    pthread_cond_signal(&(queue->notFull));
-    return task;
-}
-
 /**
  * The function `thread_routine` is a worker thread function that retrieves tasks from a queue,
  * processes them, and handles client requests.
