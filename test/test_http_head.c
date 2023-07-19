@@ -9,24 +9,24 @@
 #include <sys/socket.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-#include "crud_operations/http_get.h"
+#include "crud_operations/http_head.h"
 #include "status_codes/http_status_codes.h"
 #include "http/http_parser/http_parser.h"
 #include "http/http_response/http_response.h"
 #include "master/server_socket.h"
 
-Test(http_get, invalid_url)
+Test(http_head, invalid_url)
 {
     HttpRequest request = {
         .request_line = {
             .requestTarget = "invalid_url"
         }
     };
-    char *response = http_get(&request, 0);
+    char *response = http_head(&request, 0);
     cr_assert_null(response, "Expected NULL response for invalid URL");
 }
 
-Test(createSuccess200, success)
+Test(createSuccess200ForHead, success)
 {
     // Create a new HttpResponse
     HttpResponse *response = malloc(sizeof(HttpResponse));
@@ -48,7 +48,7 @@ Test(createSuccess200, success)
     free(response);
 }
 
-Test(createError404, not_found)
+Test(createError404ForHead, not_found)
 {
     // Create a new HttpResponse
     HttpResponse *response = malloc(sizeof(HttpResponse));
