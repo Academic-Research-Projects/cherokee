@@ -101,5 +101,6 @@ void *http_delete(HttpRequest *request, int client_socket)
         close(file_fd);
     }
     close(client_socket);
+    free(response);
     return NULL;
 }

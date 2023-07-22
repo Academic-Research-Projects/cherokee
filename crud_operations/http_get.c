@@ -99,5 +99,8 @@ void *http_get(HttpRequest *request, int client_socket)
         close(file_fd);
     }
     close(client_socket);
+    free(response_str);
+    free(response->headers);
+    free(response);
     return NULL;
 }

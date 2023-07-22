@@ -39,6 +39,7 @@ By successfully completing the Cherokee project, you will gain a deeper understa
 - Clean the program and the executable : `make fclean`
 - Re-compile the program : `make re`
 - Run the program with valgrind : `valgrind ./cherokee` => Debug mode (memory leaks)
+- Run the program with valgrind specific flags : `valgrind --leak-check=full --show-leak-kinds=all ./cherokee` => Debug mode (memory leaks)
 - Run the program with gdb : `gdb ./cherokee` => Debug mode
 - Run apache bench : `ab -n 1000 -c 100 http://localhost:8080/`
 - Run criterion tests : `make ftest`

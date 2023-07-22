@@ -108,5 +108,8 @@ void *http_head(HttpRequest *request, int client_socket)
         }
     }
     close(client_socket);
+    free(response_str);
+    free(response->headers);
+    free(response);
     return NULL;
 }
