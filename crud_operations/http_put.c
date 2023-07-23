@@ -84,6 +84,8 @@ void *http_put(HttpRequest *request, int client_socket)
             // An error occurred while trying to write to the file
             perror("write failed");
             close(file_fd);
+            free(response->headers);
+            free(response);
             return NULL;
         }
 

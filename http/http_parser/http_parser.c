@@ -16,6 +16,7 @@
 #include <sys/socket.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 bool parse_http_request(int client_socket, HttpRequest *httpRequest)
 {
@@ -24,7 +25,7 @@ bool parse_http_request(int client_socket, HttpRequest *httpRequest)
 
     size_t bytes_received = recv(client_socket, buffer, sizeof(buffer) - 1, 0);
 
-    printf(buffer);
+    //printf(buffer);
 
     if (bytes_received <= 0)
     {
@@ -68,5 +69,9 @@ bool parse_http_request(int client_socket, HttpRequest *httpRequest)
 
     httpRequest->request_line.httpVersion = strdup(token);
 
+    free(httpRequest->body);
+    free(httpRequest->request_line.method);
+    free(httpRequest->request_line.requestTarget);
+    free(httpRequest->request_line.httpVersion);
     return true;
 }
