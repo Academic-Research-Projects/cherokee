@@ -20,10 +20,8 @@
 
 void *handle_request(HttpRequest *request, int client_socket)
 {
-    //printf("Handle request : %s\n", request->request_line.method);
     if (strcmp(request->request_line.method, "GET") == 0)
     {
-        //printf("Http Get\n");
         // handle GET request
         http_get(request, client_socket);
     }
@@ -47,10 +45,5 @@ void *handle_request(HttpRequest *request, int client_socket)
         // handle DELETE request
         http_head(request, client_socket);
     }
-    // else
-    // {
-    //     // handle invalid request
-    //     // response = http_invalid_request();
-    // }
     return NULL;
 }

@@ -98,10 +98,8 @@ void threadPoolDestroy(ThreadPool *threadPool)
  * @param sig The parameter "sig" is the signal number that is received. In this case, it is used to
  * print the signal number in the printf statement.
  */
-void handle_sigint(int sig)
+void handle_sigint()
 {
-    printf("Received signal %d, shutting down worker %d...\n", sig, getpid());
-
     close(epoll_fd);
     free(events);
     close(server_socket);

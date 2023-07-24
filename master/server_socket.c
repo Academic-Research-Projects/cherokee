@@ -138,8 +138,6 @@ void fork_server(int port)
         if (childPids[i] == 0)
         {
             // This is the child process
-            printf("Child process %d\n", getpid());
-
             // Create the worker socket
             worker_sockets[i] = create_socket();
             bind_socket(worker_sockets[i], port);
@@ -151,7 +149,6 @@ void fork_server(int port)
             close(worker_sockets[i]);
 
             // Exit the child process
-            // exit(EXIT_SUCCESS);
         }
     }
 

@@ -40,9 +40,6 @@ void *http_delete(HttpRequest *request, int client_socket)
     char file_path[512] = {0};
     snprintf(file_path, sizeof(file_path), "%s/%s", BASE_DIRECTORY, request_target);
 
-    // Print request
-    printf("Request: %s\n", request_target);
-
     // Default content type
     char *content_type = "text/plain";
 
@@ -51,15 +48,12 @@ void *http_delete(HttpRequest *request, int client_socket)
 
     // Open the requested file
     int file_fd = open(file_path, O_RDONLY | O_WRONLY, 0666);
-    //printf("File descriptor: %d\n", file_fd);
-    //printf("File path: %s\n", file_path);
 
     if (file_fd == -1)
     {
         // File not found, send 404 response
         response = createError404(response);
         response_str = format_http_response(response);
-        //printf("Response: %s\n", response_str);
         write(client_socket, response_str, strlen(response_str));
     }
     else
@@ -81,22 +75,17 @@ void *http_delete(HttpRequest *request, int client_socket)
                 content_type = "text/txt";
         }
 
-        //printf("%d\n", file_fd);
-        puts("after open");
 
         if (remove(file_path) == 0)
         {
-            printf("File deleted successfully.\n");
             // send response headers
             createSuccess200(response, content_type);
             response_str = format_http_response(response);
-            printf("Response: %s\n", response_str);
             write(client_socket, response_str, strlen(response_str));
         }
         else
         {
             perror("Error deleting file");
-            // TODO : handle the 500 internal server error
         }
         close(file_fd);
     }

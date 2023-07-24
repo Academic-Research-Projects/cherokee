@@ -38,26 +38,17 @@ void *http_head(HttpRequest *request, int client_socket)
     char file_path[512] = {0};
     snprintf(file_path, sizeof(file_path), "%s/%s", BASE_DIRECTORY, request_target);
 
-    // Print request
-    printf("Request: %s\n", request_target);
-
-    // Default content type
-    char *content_type = "text/plain";
-
     struct HttpResponse *response = malloc(sizeof(struct HttpResponse));
     char *response_str;
 
     // Open the requested file
     int file_fd = open(file_path, O_RDONLY | O_WRONLY, 0666);
-    //printf("File descriptor: %d\n", file_fd);
-    //printf("File path: %s\n", file_path);
 
     if (file_fd == -1)
     {
         // File not found, send 404 response
         response = createError404(response);
         response_str = format_http_response(response);
-        //printf("Response: %s\n", response_str);
         write(client_socket, response_str, strlen(response_str));
         free(response_str);
         free(response->headers);
@@ -68,38 +59,19 @@ void *http_head(HttpRequest *request, int client_socket)
         // Determine the content type based on the file extension
         char *file_extension = strrchr(request_target, '.');
 
-        if (file_extension)
-        {
-            if (strcmp(file_extension, ".html") == 0)
-                content_type = "text/html";
-            else if (strcmp(file_extension, ".json") == 0)
-                content_type = "application/json";
-            else if (strcmp(file_extension, ".jpeg") == 0 || strcmp(file_extension, ".jpg") == 0)
-                content_type = "image/jpeg";
-            else if (strcmp(file_extension, ".png") == 0)
-                content_type = "image/png";
-            else if (strcmp(file_extension, ".txt") == 0)
-                content_type = "text/txt";
-        }
-
-        printf("%d\n", file_fd);
-        puts("after open");
-
         if (file_fd == -1)
         {
             // File not found, send 404 response
             perror("open failed");
             response = createError404(response);
             response_str = format_http_response(response);
-            printf("Response: %s\n", response_str);
             write(client_socket, response_str, strlen(response_str)); 
         }
         else
         {
             if (strcmp(file_extension, ".txt") == 0)
             {
-                printf("Test content file txt.\n");
-                
+               
                 response = createSuccess204(response);
                 response_str = format_http_response(response);
                 write(client_socket, response_str, strlen(response_str));

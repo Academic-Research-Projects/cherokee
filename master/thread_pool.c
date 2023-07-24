@@ -81,9 +81,6 @@ void *thread_routine(void *arg)
 
         pthread_mutex_unlock(&(threadPool->queue->mutex));
 
-        // Process the task
-        printf("Processing client request : %d --- in process %d --- in thread : %ld\n", task->clientSocket, getpid(), pthread_self());
-
         // Create the request object
         struct HttpRequest *http_request = malloc(sizeof(struct HttpRequest));
         if (!parse_http_request(task->clientSocket, http_request))
