@@ -11,6 +11,7 @@
 #include "http/http_response/http_response.h"
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 char *format_http_response(HttpResponse *response)
 {

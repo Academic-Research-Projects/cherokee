@@ -18,12 +18,5 @@ HttpResponse *createSuccess204(HttpResponse *response) //, char *content_type)
     response->statusCode = 204;
     response->statusText = noContentMessage();
     response->body = strdup(noContentMessage());
-    // response->httpVersion = strdup("HTTP/1.1");
-    // response->statusCode = 204;
-    // response->statusText = noContentMessage();
-    // response->headers->name = "Content-Type";
-    // response->headers->value = content_type;
-    // response->headers = NULL;
-    // response->body = NULL;
     return response;
 }

@@ -95,6 +95,7 @@ void *http_put(HttpRequest *request, int client_socket)
         free(response_str);
         free(response->headers);
         free(response);
+       
     }
 
     // Close the client socket
