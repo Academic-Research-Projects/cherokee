@@ -59,6 +59,9 @@ void *http_head(HttpRequest *request, int client_socket)
         response_str = format_http_response(response);
         //printf("Response: %s\n", response_str);
         write(client_socket, response_str, strlen(response_str));
+        free(response_str);
+        free(response->headers);
+        free(response);
     }
     else
     {
@@ -89,27 +92,23 @@ void *http_head(HttpRequest *request, int client_socket)
             response = createError404(response);
             response_str = format_http_response(response);
             printf("Response: %s\n", response_str);
-            write(client_socket, response_str, strlen(response_str));
+            write(client_socket, response_str, strlen(response_str)); 
         }
         else
         {
             if (strcmp(file_extension, ".txt") == 0)
             {
                 printf("Test content file txt.\n");
-                // send response headers
-                // TODO : refactoriser 204 response
-                response = createSuccess200(response, content_type);
+                
+                response = createSuccess204(response);
                 response_str = format_http_response(response);
-                //printf("Response: %s\n", response_str);
-                // char response[RESPONSE_BUFFER_SIZE];
-                // snprintf(response, RESPONSE_BUFFER_SIZE, "HTTP/1.1 204 OK\r\nContent-Type: %s\r\nContent-Length: %s\r\nLast-Modified: %s\r\nETag: %s\r\n\r\n", content_type, "future content length", "future last modified", "future ETag");
                 write(client_socket, response_str, strlen(response_str));
             }
         }
+        free(response_str);
+        free(response->headers);
+        free(response);
     }
     close(client_socket);
-    free(response_str);
-    free(response->headers);
-    free(response);
     return NULL;
 }

@@ -81,9 +81,6 @@ void *http_post(HttpRequest *request, int client_socket)
             response = createError404(response);
             response_str = format_http_response(response);
             write(client_socket, response_str, strlen(response_str));
-            free(response_str);
-            free(response->headers);
-            free(response);
         }
         else
         {
@@ -104,10 +101,10 @@ void *http_post(HttpRequest *request, int client_socket)
 
             write(client_socket, response_str, strlen(response_str));
 
+            close(file_fd);
             free(response_str);
             free(response->headers);
             free(response);
-            close(file_fd);
         }
     }
 
