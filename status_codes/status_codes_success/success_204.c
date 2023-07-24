@@ -4,11 +4,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-char *noContentMessage(void)
-{
-    return "No Content\n";
-}
-
 HttpResponse *createSuccess204(HttpResponse *response) //, char *content_type)
 {
     response->headers = malloc(sizeof(struct ResponseHeaders));
@@ -16,7 +11,7 @@ HttpResponse *createSuccess204(HttpResponse *response) //, char *content_type)
     response->headers->value = "text/plain";
     response->httpVersion = "HTTP/1.1";
     response->statusCode = 204;
-    response->statusText = noContentMessage();
-    response->body = strdup(noContentMessage());
+    response->statusText = "No Content";
+    response->body = strdup("No Content");
     return response;
 }

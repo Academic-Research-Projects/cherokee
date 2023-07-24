@@ -48,11 +48,11 @@ Task *get_task_from_queue(ThreadPoolQueue *queue)
 /**
  * The function `thread_routine` is a worker thread function that retrieves tasks from a queue,
  * processes them, and handles client requests.
- * 
+ *
  * @param arg The `arg` parameter is a void pointer that is passed to the thread routine function. In
  * this case, it is expected to be a pointer to a `ThreadPool` object. The `ThreadPool` object contains
  * information about the thread pool, including a pointer to the task queue that the threads will be.
- * 
+ *
  * @return a `void` pointer, which is `NULL`.
  */
 void *thread_routine(void *arg)
@@ -93,6 +93,10 @@ void *thread_routine(void *arg)
 
         handle_request(http_request, task->clientSocket);
 
+        free(http_request->body);
+        free(http_request->request_line.method);
+        free(http_request->request_line.requestTarget);
+        free(http_request->request_line.httpVersion);
         free(http_request);
         free(task);
     }
@@ -128,7 +132,7 @@ pthread_t *threadPoolInit(ThreadPool *threadPool, int numThreads)
 /**
  * The function `threadPoolEnqueue` adds a task to the thread pool's task queue, waiting if the queue
  * is full.
- * 
+ *
  * @param threadPool A pointer to the ThreadPool structure, which contains information about the thread
  * pool and its associated queue.
  * @param task A pointer to a Task object that represents the task to be enqueued in the thread pool.

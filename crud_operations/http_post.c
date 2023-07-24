@@ -2,12 +2,12 @@
  * The function `http_post` handles a POST request by extracting the requested file name, constructing
  * the file path, checking the file extension, creating the appropriate response, and writing the
  * response to the client socket.
- * 
+ *
  * @param request A pointer to an HttpRequest struct, which contains information about the client's
  * HTTP request.
  * @param client_socket The `client_socket` parameter is the file descriptor for the socket connection
  * between the server and the client. It is used to send and receive data over the network.
- * 
+ *
  * @return a NULL pointer.
  */
 #include <pthread.h>
@@ -40,7 +40,8 @@ void *http_post(HttpRequest *request, int client_socket)
     sscanf(request_target, "/%s", filename);
     // construct the complete file path
     char file_path[FILE_PATH_SIZE] = {0};
-    snprintf(file_path, sizeof(file_path), "%s/%s", BASE_DIRECTORY, filename);
+    strcpy(file_path, BASE_DIRECTORY);
+    strcat(file_path, request_target);
 
     // default content type
     char *content_type = "text/plain";
@@ -60,7 +61,7 @@ void *http_post(HttpRequest *request, int client_socket)
         else if (strcmp(file_extension, ".png") == 0)
             content_type = "image/png";
         else if (strcmp(file_extension, ".txt") == 0)
-            content_type = "text/txt";  
+            content_type = "text/txt";
     }
 
     if (access(file_path, F_OK) != -1)
@@ -104,6 +105,7 @@ void *http_post(HttpRequest *request, int client_socket)
             close(file_fd);
             free(response_str);
             free(response->headers);
+            free(response->body);
             free(response);
         }
     }

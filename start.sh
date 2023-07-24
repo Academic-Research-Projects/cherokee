@@ -7,7 +7,8 @@ echo "curl GET index.html"
 curl http://localhost:8080/index.html
 echo -e "\n\n ------------------"
 echo "curl GET index-demo.html"
-curl http://localhost:8080/back-to-the-future.jpg
+# Download and output dev/null
+curl http://localhost:8080/back-to-the-future.jpg --output /dev/null
 
 # curl HEAD
 echo -e "\n\n ------------------"
@@ -23,7 +24,7 @@ curl http://localhost:8080/index-demo.html
 # curl PUT
 echo "curl PUT index-demo.html"
 echo -e "\n\n ------------------"
-curl -X PUT -d "Hello World" http://localhost:8080/index-demo.html
+curl -X PUT -d "Hello World 2" http://localhost:8080/index-demo.html
 curl http://localhost:8080/index-demo.html
 
 # curl DELETE

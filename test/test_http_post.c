@@ -25,9 +25,10 @@
 extern void *http_post(HttpRequest *request, int client_socket);
 
 // Test case for successful file creation
-Test(http_post, file_creation_success) {
+Test(http_post, file_creation_success)
+{
     // Create a test file request
-    HttpRequest *request =  malloc(sizeof(HttpRequest));
+    HttpRequest *request = malloc(sizeof(HttpRequest));
     request->body = strdup("This is a test file.");
     // Generate a unique filename based on the current timestamp
     struct timeval tv;
@@ -52,7 +53,7 @@ Test(http_post, file_creation_success) {
     int status_code;
     read(pipefd[0], response, sizeof(response));
     sscanf(response, "HTTP/1.1 %d", &status_code);
-    
+
     // Check that the response is a 200 OK
     cr_assert_eq(status_code, 200, "Response does not match expected value");
 
@@ -63,7 +64,8 @@ Test(http_post, file_creation_success) {
     free(request);
 }
 
-Test(http_post, file_already_exists) {
+Test(http_post, file_already_exists)
+{
     // Create a test file request
     HttpRequest *request = malloc(sizeof(HttpRequest));
     request->body = strdup("This is a test file.");
@@ -85,7 +87,7 @@ Test(http_post, file_already_exists) {
     int status_code;
     read(pipefd[0], response, sizeof(response));
     sscanf(response, "HTTP/1.1 %d", &status_code);
-    
+
     // Check that the response is a 409 Conflict
     cr_assert_eq(status_code, 409, "Response does not match expected value");
 
