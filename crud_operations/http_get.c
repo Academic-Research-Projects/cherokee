@@ -55,6 +55,9 @@ void *http_get(HttpRequest *request, int client_socket)
         response = createError404(response);
         response_str = format_http_response(response);
         write(client_socket, response_str, strlen(response_str));
+        free(response_str);
+        free(response->headers);
+        free(response);
     }
     else
     {
@@ -81,9 +84,7 @@ void *http_get(HttpRequest *request, int client_socket)
 
         write(client_socket, response_str, strlen(response_str));
 
-        free(response_str);
-        free(response->headers);
-        free(response);
+        
 
         // Read and send the file contents
         char file_buffer[1024];
@@ -95,12 +96,12 @@ void *http_get(HttpRequest *request, int client_socket)
         {
             write(client_socket, file_buffer, bytes_read);
         }
-
+        free(response_str);
+        free(response->headers);
+        free(response);
         close(file_fd);
     }
     close(client_socket);
-    free(response_str);
-    free(response->headers);
-    free(response);
+
     return NULL;
 }
