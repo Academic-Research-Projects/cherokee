@@ -9,7 +9,7 @@ HttpResponse *createSuccess200(HttpResponse *response, char *content_type)
     response->headers = malloc(sizeof(struct ResponseHeaders));
     response->httpVersion = "HTTP/1.1";
     response->statusCode = 200;
-    response->statusText = "OK";
+    response->statusText = "OK\n";
     response->headers->name = "Content-Type";
     response->headers->value = content_type;
     response->body = strdup("OK\n");
