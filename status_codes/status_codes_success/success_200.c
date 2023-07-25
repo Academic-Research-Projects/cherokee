@@ -4,19 +4,14 @@
 #include <string.h>
 #include <stdlib.h>
 
-char *successMessage(void)
-{
-    return "OK\n";
-}
-
 HttpResponse *createSuccess200(HttpResponse *response, char *content_type)
 {
     response->headers = malloc(sizeof(struct ResponseHeaders));
     response->httpVersion = "HTTP/1.1";
     response->statusCode = 200;
-    response->statusText = successMessage();
+    response->statusText = "OK\n";
     response->headers->name = "Content-Type";
     response->headers->value = content_type;
-    response->body = strdup(successMessage());
+    response->body = strdup("OK\n");
     return response;
 }

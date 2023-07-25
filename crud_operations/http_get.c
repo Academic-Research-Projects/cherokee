@@ -32,11 +32,8 @@ void *http_get(HttpRequest *request, int client_socket)
 
     // Construct the complete file path
     char file_path[512] = {0};
-    snprintf(file_path, sizeof(file_path), "%s/%s", BASE_DIRECTORY, request_target);
-    puts(file_path);
-
-    // Print request
-    // printf("Request: %s\n", request_target);
+    strcpy(file_path, BASE_DIRECTORY);
+    strcat(file_path, request_target);
 
     struct HttpResponse *response = malloc(sizeof(struct HttpResponse));
     char *response_str;
@@ -46,8 +43,6 @@ void *http_get(HttpRequest *request, int client_socket)
 
     // Open the requested file
     int file_fd = open(file_path, O_RDONLY);
-    // printf("File descriptor: %d\n", file_fd);
-    // printf("File path: %s\n", file_path);
 
     if (file_fd == -1)
     {
@@ -79,18 +74,11 @@ void *http_get(HttpRequest *request, int client_socket)
         createSuccess200(response, content_type);
         response_str = format_http_response(response);
 
-        printf("Response: %s\n", response_str);
-        printf("client_socket: %d\n", client_socket);
-
         write(client_socket, response_str, strlen(response_str));
-
-        
 
         // Read and send the file contents
         char file_buffer[1024];
         ssize_t bytes_read;
-
-        // printf("Writing request to client socket");
 
         while ((bytes_read = read(file_fd, file_buffer, sizeof(file_buffer))) > 0)
         {
@@ -98,6 +86,7 @@ void *http_get(HttpRequest *request, int client_socket)
         }
         free(response_str);
         free(response->headers);
+        free(response->body);
         free(response);
         close(file_fd);
     }

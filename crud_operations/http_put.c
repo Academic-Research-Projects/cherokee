@@ -40,7 +40,8 @@ void *http_put(HttpRequest *request, int client_socket)
 
     // Construct the complete file path
     char file_path[FILE_PATH_SIZE] = {0};
-    snprintf(file_path, sizeof(file_path), "%s/%s", BASE_DIRECTORY, request_target);
+    strcpy(file_path, BASE_DIRECTORY);
+    strcat(file_path, request_target);
 
     struct HttpResponse *response = malloc(sizeof(struct HttpResponse));
     char *response_str;
@@ -92,10 +93,11 @@ void *http_put(HttpRequest *request, int client_socket)
         createSuccess200(response, content_type);
         response_str = format_http_response(response);
         write(client_socket, response_str, strlen(response_str));
+
         free(response_str);
         free(response->headers);
+        free(response->body);
         free(response);
-       
     }
 
     // Close the client socket

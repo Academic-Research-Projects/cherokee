@@ -38,7 +38,8 @@ void *http_delete(HttpRequest *request, int client_socket)
 
     // Construct the complete file path
     char file_path[512] = {0};
-    snprintf(file_path, sizeof(file_path), "%s/%s", BASE_DIRECTORY, request_target);
+    strcpy(file_path, BASE_DIRECTORY);
+    strcat(file_path, request_target);
 
     // Default content type
     char *content_type = "text/plain";
@@ -75,7 +76,6 @@ void *http_delete(HttpRequest *request, int client_socket)
                 content_type = "text/txt";
         }
 
-
         if (remove(file_path) == 0)
         {
             // send response headers
@@ -90,6 +90,7 @@ void *http_delete(HttpRequest *request, int client_socket)
         close(file_fd);
     }
     close(client_socket);
+    free(response->body);
     free(response);
     return NULL;
 }
