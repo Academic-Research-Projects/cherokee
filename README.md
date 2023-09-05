@@ -1,5 +1,9 @@
-# Groupe de blanch_b 1003936
-login: blanch_b loizag_g utzman_f baudet_c
+# Three french guys and one venezuelan gal producing code for software engineering school
+Team :
+👨🏼‍🦱 Corentin BAUDET
+👦🏻 Brice BLANCHARD
+👩🏻 Génesis LOIZAGA
+🧔🏻 François UTZMANN
 
 # Cherokee - HTTP Server Implementation in C
 
